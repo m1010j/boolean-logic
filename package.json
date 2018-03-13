@@ -1,23 +1,23 @@
 {
-  "name": "logic",
+  "name": "boolean-logic",
   "version": "1.0.0",
   "description":
     "A lightweight package for evaluating sentential logic sentences",
-  "main": "logic.js",
+  "main": "boolean-logic.js",
   "dependencies": {},
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "git+https://github.com/m1010j/logic.git",
+  "repository": "git+https://github.com/m1010j/boolean-logic.git",
   "keywords": ["logic", "boolean", "satisfiability"],
   "author": "Matthias Jenny",
   "email": "matthiascjenny@gmail.com",
   "url": "http://www.matthiasjenny.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/m1010j/logic/issues"
+    "url": "https://github.com/m1010j/boolean-logic/issues"
   },
-  "homepage": "https://github.com/m1010j/logic#readme",
+  "homepage": "https://github.com/m1010j/boolean-logic#readme",
   "private": false
 }

@@ -1,18 +1,10 @@
-# Logic.js
+# `boolean-logic`
 
 ## A lightweight package for evaluating sentential logic sentences
 
 ### Overview
 
-The `logic` package allows well-formed formulas to be evaluated for truth or falsity using the `isTrue` function and for satisfiability using the `isSat` function. The default object exported by `logic` contains `isTrue` and `isSat` as properties.
-
-### Installation
-
-`npm install logic`
-
-or
-
-`yarn install logic`
+The `boolean-logic` package allows well-formed formulas to be evaluated for truth or falsity using the `isTrue` function and for satisfiability using the `isSat` function. The default object exported by `boolean-logic` contains `isTrue` and `isSat` as properties.
 
 ### Well-formed formulas
 
@@ -27,11 +19,11 @@ As is usual, outer parentheses can be dropped, as can parentheses that are used 
 
 ### Installation
 
-`npm install logic`
+`npm install boolean-logic`
 
 or
 
-`yarn install logic`
+`yarn install boolean-logic`
 
 ### Syntax
 
@@ -68,7 +60,7 @@ isSat(wff);
 ### Examples
 
 ```javascript
-import { isTrue, isSat } from 'logic';
+import { isTrue, isSat } from 'boolean-logic';
 
 isTrue('t'); // true
 isTrue('f'); // false
@@ -85,8 +77,8 @@ isTrue('At'); // undefined
 isSat('A1'); // undefined
 ```
 
-The educational logic game [Andor](http://www.andor.fun) is powered by the `logic` package.
+The educational logic game [Andor](http://www.andor.fun) is powered by the `boolean-logic` package.
 
 ### License
 
-Logic.js is [MIT licensed](./LICENSE).
+`boolean-logic` is [MIT licensed](./LICENSE).
