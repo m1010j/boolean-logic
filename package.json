@@ -1,13 +1,19 @@
 {
   "name": "boolean-logic",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description":
     "A lightweight package for evaluating formulas of Boolean logic",
   "main": "boolean-logic.js",
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-preset-env": "*",
+    "jest": "*"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
+  },
+  "jest": {
+    "automock": true
   },
   "repository": "git+https://github.com/m1010j/boolean-logic.git",
   "keywords": ["logic", "boolean", "satisfiability"],

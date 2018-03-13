@@ -59,6 +59,7 @@ class Logic {
   }
 
   isTrue(model) {
+    model = model || {};
     const modelValues = Object.values(model);
     for (let i = 0; i < modelValues.length; i++) {
       if (modelValues[i] !== true && modelValues[i] !== false) {
@@ -391,8 +392,8 @@ Logic._ensureIsArray = function(array) {
   return array;
 };
 
-// export const isTrue = Logic.isTrue.bind(Logic);
-//
-// export const isSat = Logic.isSat.bind(Logic);
-//
-// export default Logic;
+export const isTrue = Logic.isTrue.bind(Logic);
+
+export const isSat = Logic.isSat.bind(Logic);
+
+export default Logic;
