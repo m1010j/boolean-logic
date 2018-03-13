@@ -1,8 +1,8 @@
 {
   "name": "boolean-logic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description":
-    "A lightweight package for evaluating sentential logic sentences",
+    "A lightweight package for evaluating formulas of Boolean logic",
   "main": "boolean-logic.js",
   "dependencies": {},
   "devDependencies": {},
