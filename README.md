@@ -1,6 +1,6 @@
 # `boolean-logic`
 
-## A lightweight package for evaluating sentential logic sentences
+## A lightweight package for evaluating formulas of sentential logic
 
 ### Overview
 
