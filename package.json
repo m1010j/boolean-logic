@@ -3,16 +3,19 @@
   "version": "1.0.0",
   "description":
     "A lightweight package for evaluating sentential logic sentences",
-  "main": "index.js",
+  "main": "logic.js",
+  "dependencies": {},
+  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --watch"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": "git+https://github.com/m1010j/logic.git",
+  "keywords": ["logic", "boolean", "satisfiability"],
   "author": "Matthias Jenny",
   "license": "MIT",
-  "dependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.4",
-    "babel-preset-env": "^1.6.1"
-  }
+  "bugs": {
+    "url": "https://github.com/m1010j/logic/issues"
+  },
+  "homepage": "https://github.com/m1010j/logic#readme",
+  "private": false
 }
