@@ -12,6 +12,8 @@
   "repository": "git+https://github.com/m1010j/logic.git",
   "keywords": ["logic", "boolean", "satisfiability"],
   "author": "Matthias Jenny",
+  "email": "matthiascjenny@gmail.com",
+  "url": "http://www.matthiasjenny.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/m1010j/logic/issues"
