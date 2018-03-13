@@ -384,8 +384,8 @@ Logic._ensureIsArray = function(array) {
   return array;
 };
 
-export const isTrue = Sentence.isTrue.bind(Sentence);
+export const isTrue = Logic.isTrue.bind(Logic);
 
-export const isSat = Sentence.isSat.bind(Sentence);
+export const isSat = Logic.isSat.bind(Logic);
 
-export default Sentence;
+export default Logic;
