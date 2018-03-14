@@ -342,7 +342,7 @@ Logic._mainConnectiveIdx = function(sentArr) {
       return matchingClosingParensIdx + 1;
     } else {
       const secondMainConnIdx =
-        sentArr.slice(matchingClosingParensIdx + 2)._mainConnectiveIdx() +
+        this._mainConnectiveIdx(sentArr.slice(matchingClosingParensIdx + 2)) +
         matchingClosingParensIdx +
         2;
       if (
