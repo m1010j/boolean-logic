@@ -160,6 +160,9 @@ Logic._generateModels = function(array) {
 
 Logic._atomics = function(array) {
   array = this._ensureIsArray(array);
+  if (!array) {
+    return;
+  }
   const atomics = [];
   array.forEach(el => {
     if (this._isAtomic(el) && !atomics.includes(el)) {
@@ -171,6 +174,9 @@ Logic._atomics = function(array) {
 
 Logic._parse = function(array) {
   array = Logic._ensureIsArray(array);
+  if (!array) {
+    return;
+  }
   const translation = array.map(el => this._dictionary[el] || el);
   const mainConnectiveIdx = this._mainConnectiveIdx(translation);
   const mainConnective = translation[mainConnectiveIdx];
