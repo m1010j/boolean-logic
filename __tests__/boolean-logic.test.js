@@ -74,8 +74,17 @@ describe('isTrue', () => {
     expect(isTrue('tXfXf')).toBe(true);
     expect(isTrue('tBtBt')).toBe(true);
   });
+  it('also takes arrays of strings as arguments', () => {
+    expect(isTrue(['N', 'N', 't'])).toBe(true);
+  });
   it("returns undefined for strings that aren't well-formed", () => {
     expect(isTrue('At')).toBe(undefined);
+  });
+  it('returns undefined for strings that contain unknown vocabulary', () => {
+    expect(isTrue('tCt')).toBe(undefined);
+  });
+  it("returns undefined for arguments that aren't strings or arrays", () => {
+    expect(isTrue({})).toBe(undefined);
   });
 });
 
@@ -95,8 +104,17 @@ describe('isSat', () => {
   it("evauates '1ON1' to unsatisfiable", () => {
     expect(isSat('1AN1')).toBe(false);
   });
+  it('also takes arrays of strings as arguments', () => {
+    expect(isSat(['N', 'N', 't'])).toBe(true);
+  });
   it("returns undefined for strings that aren't well-formed", () => {
     expect(isSat('At')).toBe(undefined);
+  });
+  it('returns undefined for strings that contain unknown vocabulary', () => {
+    expect(isSat('tCt')).toBe(undefined);
+  });
+  it("returns undefined for arguments that aren't strings or arrays", () => {
+    expect(isSat({})).toBe(undefined);
   });
 });
 
