@@ -113,25 +113,9 @@ Logic._booleans = {
   f: false,
 };
 
-Logic._dictionary = {
-  N: 'N',
-  A: 'A',
-  O: 'O',
-  I: 'I',
-  T: 'T',
-  B: 'B',
-  X: 'X',
-  "it's false that": 'N',
-  and: 'A',
-  or: 'O',
-  then: 'T',
-  'if and only if': 'B',
-  xor: 'X',
-  '(': '(',
-  ')': ')',
-};
-
 Logic._binaryConns = ['A', 'O', 'T', 'B', 'X'];
+
+Logic._vocabulary = Logic._binaryConns.concat(['N', '(', ')', 't', 'f']);
 
 Logic._connectives = {
   A: (sentOne, sentTwo) => sentOne && sentTwo,
@@ -177,36 +161,33 @@ Logic._parse = function(array) {
   if (!array) {
     return;
   }
-  const translation = array.map(el => this._dictionary[el] || el);
-  const mainConnectiveIdx = this._mainConnectiveIdx(translation);
-  const mainConnective = translation[mainConnectiveIdx];
-  if (translation.length === 1 && Logic._isAtomic(translation[0])) {
-    return new Logic(translation[0]);
+  const mainConnectiveIdx = this._mainConnectiveIdx(array);
+  const mainConnective = array[mainConnectiveIdx];
+  if (array.length === 1 && Logic._isAtomic(array[0])) {
+    return new Logic(array[0]);
   } else if (
-    translation[0] === '(' &&
-    translation.length > 3 &&
-    this._matchingClosingParensIdx(translation, 0) === translation.length - 1
+    array[0] === '(' &&
+    array.length > 3 &&
+    this._matchingClosingParensIdx(array, 0) === array.length - 1
   ) {
     if (
-      translation[1] === '(' &&
-      this._matchingClosingParensIdx(translation, 1) === translation.length - 2
+      array[1] === '(' &&
+      this._matchingClosingParensIdx(array, 1) === array.length - 2
     ) {
       return;
     } else {
-      return this._parse(translation.slice(1, translation.length - 1));
+      return this._parse(array.slice(1, array.length - 1));
     }
   } else if (mainConnectiveIdx === 0) {
-    const prejacent = this._parse(translation.slice(1));
-    const connective = new Logic(translation[mainConnectiveIdx]);
+    const prejacent = this._parse(array.slice(1));
+    const connective = new Logic(array[mainConnectiveIdx]);
     if (prejacent) {
       connective.addChild(prejacent);
       return connective;
     }
   } else if (mainConnectiveIdx) {
-    const firstConjunct = this._parse(translation.slice(0, mainConnectiveIdx));
-    const secondConjunct = this._parse(
-      translation.slice(mainConnectiveIdx + 1)
-    );
+    const firstConjunct = this._parse(array.slice(0, mainConnectiveIdx));
+    const secondConjunct = this._parse(array.slice(mainConnectiveIdx + 1));
     if (firstConjunct && secondConjunct) {
       const connective = new Logic(mainConnective);
       if (mainConnective) {
@@ -221,12 +202,15 @@ Logic._parse = function(array) {
 Logic._parseString = function(str) {
   const parsed = [];
   for (let i = 0; i < str.length; i++) {
-    const translation = this._dictionary[str[i]];
-    if (translation) {
-      parsed.push(translation);
+    if (this._vocabulary.includes(str[i])) {
+      parsed.push(str[i]);
     } else {
       let subStr = '';
-      for (let j = i; j < str.length && !this._dictionary[str[j]]; j++) {
+      for (
+        let j = i;
+        j < str.length && !this._vocabulary.includes(str[j]);
+        j++
+      ) {
         subStr += str[j];
         i = j;
       }
