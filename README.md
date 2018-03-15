@@ -79,6 +79,6 @@ isSat('A1'); // undefined
 
 The educational logic game [Andor](http://www.andor.fun) is powered by the `boolean-logic` package.
 
-### License
+### [Contributing](./CONTRIBUTING.md)
 
-`boolean-logic` is [MIT licensed](./LICENSE).
+### [License](./LICENSE)
