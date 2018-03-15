@@ -60,7 +60,7 @@ class Logic {
 
   isTrue(model) {
     model = model || {};
-    const modelValues = Object.values(model);
+    const modelValues = Object.keys(model).map(key => model[key]);
     for (let i = 0; i < modelValues.length; i++) {
       if (modelValues[i] !== true && modelValues[i] !== false) {
         return;
@@ -86,7 +86,7 @@ class Logic {
   }
 }
 
-Logic.isTrue = function(array, model, ignoreIfs) {
+Logic.isTrue = function(array, model) {
   const parsed = Logic._parse(array);
   if (!parsed) {
     return;
@@ -94,7 +94,7 @@ Logic.isTrue = function(array, model, ignoreIfs) {
   return parsed.isTrue(model);
 };
 
-Logic.isSat = function(array, ignoreIfs) {
+Logic.isSat = function(array) {
   const parsed = Logic._parse(array);
   if (!parsed) {
     return;
