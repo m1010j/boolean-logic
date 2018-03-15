@@ -81,10 +81,18 @@ describe('isTrue', () => {
     expect(isTrue('At')).toBe(undefined);
   });
   it('returns undefined for strings that contain unknown vocabulary', () => {
-    expect(isTrue('tCt')).toBe(undefined);
+    function error() {
+      isTrue('tCt');
+    }
+    expect(error).toThrow(
+      "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+    );
   });
-  it("returns undefined for arguments that aren't strings or arrays", () => {
-    expect(isTrue({})).toBe(undefined);
+  it("throws error for arguments that aren't strings or arrays", () => {
+    function error() {
+      isTrue({});
+    }
+    expect(error).toThrow('Argument must be either a string or an array');
   });
 });
 
@@ -111,10 +119,18 @@ describe('isSat', () => {
     expect(isSat('At')).toBe(undefined);
   });
   it('returns undefined for strings that contain unknown vocabulary', () => {
-    expect(isSat('tCt')).toBe(undefined);
+    function error() {
+      isSat('tCt');
+    }
+    expect(error).toThrow(
+      "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+    );
   });
-  it("returns undefined for arguments that aren't strings or arrays", () => {
-    expect(isSat({})).toBe(undefined);
+  it("throws error for arguments that aren't strings or arrays", () => {
+    function error() {
+      isSat({});
+    }
+    expect(error).toThrow('Argument must be either a string or an array');
   });
 });
 

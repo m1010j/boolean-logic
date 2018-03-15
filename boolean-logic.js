@@ -157,9 +157,10 @@ Logic._atomics = function(array) {
 };
 
 Logic._parse = function(array) {
+  this._ensureIsLegal(array);
   array = Logic._ensureIsArray(array);
   if (!array) {
-    return;
+    throw 'Argument must be either a string or an array';
   }
   const mainConnectiveIdx = this._mainConnectiveIdx(array);
   const mainConnective = array[mainConnectiveIdx];
@@ -380,6 +381,14 @@ Logic._ensureIsArray = function(array) {
     return;
   }
   return array;
+};
+
+Logic._ensureIsLegal = function(array) {
+  for (let i = 0; i < array.length; i++) {
+    if (!this._vocabulary.includes(array[i]) && !this._isAtomic(array[i])) {
+      throw "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)";
+    }
+  }
 };
 
 export const isTrue = Logic.isTrue.bind(Logic);
