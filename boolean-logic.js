@@ -94,7 +94,7 @@ Logic.isTrue = function(array, model) {
   return parsed.isTrue(model);
 };
 
-Logic.isSat = function(array) {
+Logic.isSat = function(array, returnModel) {
   const parsed = Logic._parse(array);
   if (!parsed) {
     return;
@@ -102,7 +102,7 @@ Logic.isSat = function(array) {
   const models = this._generateModels(array);
   for (let i = 0; i < models.length; i++) {
     if (parsed.isTrue(models[i])) {
-      return true;
+      return returnModel ? models[i] : true;
     }
   }
   return false;
@@ -133,9 +133,9 @@ Logic._generateModels = function(array) {
     const newModel = {};
     atomics.forEach(atomic => {
       if (subset.includes(atomic)) {
-        newModel[atomic] = true;
-      } else {
         newModel[atomic] = false;
+      } else {
+        newModel[atomic] = true;
       }
     });
     return newModel;

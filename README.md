@@ -50,16 +50,18 @@ isTrue(wff[, model]);
 #### `isSat()`
 
 ```javascript
-isSat(wff);
+isSat(wff[, returnModel]);
 ```
 
 ##### Parameters
 
 `wff`: The wff to be evaluated.
 
+`returnModel` (optional): A Boolean indicating whether function should return a model or `true` if `wff` is satisfiable.
+
 ##### Return value
 
-`true`, `false`, or `undefined` (if `wff` isn't well-formed).
+`true`, a plain object mapping numerals to Booleans (if `returnModel === true`), `false`, or `undefined` (if `wff` isn't well-formed).
 
 ### Examples
 
