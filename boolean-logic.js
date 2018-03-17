@@ -160,7 +160,7 @@ Logic._parse = function(wff) {
   this._ensureIsLegal(wff);
   wff = Logic._ensureIsArray(wff);
   if (!wff) {
-    throw 'Argument must be either a string or an wff';
+    throw 'Argument must be either a string or an array';
   }
   const mainConnectiveIdx = this._mainConnectiveIdx(wff);
   const mainConnective = wff[mainConnectiveIdx];
