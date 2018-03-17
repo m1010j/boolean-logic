@@ -86,20 +86,20 @@ class Logic {
   }
 }
 
-Logic.isTrue = function(array, model) {
-  const parsed = Logic._parse(array);
+Logic.isTrue = function(wff, model) {
+  const parsed = Logic._parse(wff);
   if (!parsed) {
     return;
   }
   return parsed.isTrue(model);
 };
 
-Logic.isSat = function(array, returnModel) {
-  const parsed = Logic._parse(array);
+Logic.isSat = function(wff, returnModel) {
+  const parsed = Logic._parse(wff);
   if (!parsed) {
     return;
   }
-  const models = this._generateModels(array);
+  const models = this._generateModels(wff);
   for (let i = 0; i < models.length; i++) {
     if (parsed.isTrue(models[i])) {
       return returnModel ? models[i] : true;
@@ -126,8 +126,8 @@ Logic._connectives = {
   N: sentence => !sentence,
 };
 
-Logic._generateModels = function(array) {
-  const atomics = this._atomics(array);
+Logic._generateModels = function(wff) {
+  const atomics = this._atomics(wff);
   const subsets = this._subsets(atomics);
   return subsets.map(subset => {
     const newModel = {};
@@ -142,13 +142,13 @@ Logic._generateModels = function(array) {
   });
 };
 
-Logic._atomics = function(array) {
-  array = this._ensureIsArray(array);
-  if (!array) {
+Logic._atomics = function(wff) {
+  wff = this._ensureIsArray(wff);
+  if (!wff) {
     return;
   }
   const atomics = [];
-  array.forEach(el => {
+  wff.forEach(el => {
     if (this._isAtomic(el) && !atomics.includes(el)) {
       atomics.push(el);
     }
@@ -156,39 +156,39 @@ Logic._atomics = function(array) {
   return atomics;
 };
 
-Logic._parse = function(array) {
-  this._ensureIsLegal(array);
-  array = Logic._ensureIsArray(array);
-  if (!array) {
-    throw 'Argument must be either a string or an array';
+Logic._parse = function(wff) {
+  this._ensureIsLegal(wff);
+  wff = Logic._ensureIsArray(wff);
+  if (!wff) {
+    throw 'Argument must be either a string or an wff';
   }
-  const mainConnectiveIdx = this._mainConnectiveIdx(array);
-  const mainConnective = array[mainConnectiveIdx];
-  if (array.length === 1 && Logic._isAtomic(array[0])) {
-    return new Logic(array[0]);
+  const mainConnectiveIdx = this._mainConnectiveIdx(wff);
+  const mainConnective = wff[mainConnectiveIdx];
+  if (wff.length === 1 && Logic._isAtomic(wff[0])) {
+    return new Logic(wff[0]);
   } else if (
-    array[0] === '(' &&
-    array.length > 3 &&
-    this._matchingClosingParensIdx(array, 0) === array.length - 1
+    wff[0] === '(' &&
+    wff.length > 3 &&
+    this._matchingClosingParensIdx(wff, 0) === wff.length - 1
   ) {
     if (
-      array[1] === '(' &&
-      this._matchingClosingParensIdx(array, 1) === array.length - 2
+      wff[1] === '(' &&
+      this._matchingClosingParensIdx(wff, 1) === wff.length - 2
     ) {
       return;
     } else {
-      return this._parse(array.slice(1, array.length - 1));
+      return this._parse(wff.slice(1, wff.length - 1));
     }
   } else if (mainConnectiveIdx === 0) {
-    const prejacent = this._parse(array.slice(1));
-    const connective = new Logic(array[mainConnectiveIdx]);
+    const prejacent = this._parse(wff.slice(1));
+    const connective = new Logic(wff[mainConnectiveIdx]);
     if (prejacent) {
       connective.addChild(prejacent);
       return connective;
     }
   } else if (mainConnectiveIdx) {
-    const firstConjunct = this._parse(array.slice(0, mainConnectiveIdx));
-    const secondConjunct = this._parse(array.slice(mainConnectiveIdx + 1));
+    const firstConjunct = this._parse(wff.slice(0, mainConnectiveIdx));
+    const secondConjunct = this._parse(wff.slice(mainConnectiveIdx + 1));
     if (firstConjunct && secondConjunct) {
       const connective = new Logic(mainConnective);
       if (mainConnective) {
@@ -374,18 +374,18 @@ Logic._remove = function(sentArr, el) {
   if (idx !== -1) sentArr.splice(idx, 1);
 };
 
-Logic._ensureIsArray = function(array) {
-  if (typeof array === 'string') {
-    array = this._parseString(array);
-  } else if (!(array instanceof Array)) {
+Logic._ensureIsArray = function(wff) {
+  if (typeof wff === 'string') {
+    wff = this._parseString(wff);
+  } else if (!(wff instanceof Array)) {
     return;
   }
-  return array;
+  return wff;
 };
 
-Logic._ensureIsLegal = function(array) {
-  for (let i = 0; i < array.length; i++) {
-    if (!this._vocabulary.includes(array[i]) && !this._isAtomic(array[i])) {
+Logic._ensureIsLegal = function(wff) {
+  for (let i = 0; i < wff.length; i++) {
+    if (!this._vocabulary.includes(wff[i]) && !this._isAtomic(wff[i])) {
       throw "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)";
     }
   }
