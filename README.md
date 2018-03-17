@@ -79,6 +79,7 @@ isSat('t'); // true
 isSat('f'); // false
 isSat('1'); // true
 isSat(['(', '1', 'A', 'N', '1', ')']); // false
+isTrue('(1O2)', true); // { 1: true, 2: true }
 
 isTrue('At'); // undefined
 isSat('A1'); // undefined
