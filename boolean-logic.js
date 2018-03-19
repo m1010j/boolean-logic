@@ -95,13 +95,17 @@ Logic.isTrue = function(wff, model) {
 };
 
 Logic.isSat = function(wff, returnModel) {
-  const parsed = Logic._parse(wff);
-  if (!parsed) {
+  const parsedWff = Logic._parse(wff);
+  if (!parsedWff) {
     return;
   }
   const models = this._generateModels(wff);
+  return this._checkModels(parsedWff, models, returnModel);
+};
+
+Logic._checkModels = function(parsedWff, models, returnModel) {
   for (let i = 0; i < models.length; i++) {
-    if (parsed.isTrue(models[i])) {
+    if (parsedWff.isTrue(models[i])) {
       return returnModel ? models[i] : true;
     }
   }

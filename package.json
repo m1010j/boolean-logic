@@ -1,6 +1,6 @@
 {
   "name": "boolean-logic",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description":
     "A lightweight package for evaluating formulas of Boolean logic",
   "main": "boolean-logic.js",
