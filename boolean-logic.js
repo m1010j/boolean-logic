@@ -58,6 +58,29 @@ class Logic {
     return false;
   }
 
+  stringify() {
+    if (this.children.length === 0) {
+      return this.value;
+    } else if (this.children.length === 1) {
+      const child0String = this.children[0].stringify();
+      if (!child0String) {
+        return
+      } else {
+        return `(${this.value}${child0String})`;
+      }
+    } else if (this.children.length === 2) {
+      const child0String = this.children[0].stringify();
+      const child1String = this.children[1].stringify();
+      if (!child0String || !child1String) {
+        return;
+      } else {
+        return `(${child0String}${this.value}${child1String})`;
+      }
+    } else {
+      return;
+    }
+  }
+
   isTrue(model) {
     model = model || {};
     const modelValues = Object.keys(model).map(key => model[key]);
@@ -72,9 +95,7 @@ class Logic {
       model || {},
       this.constructor._booleans
     );
-    if (!this.wff()) {
-      return;
-    } else if (this.atomic()) {
+    if (this.atomic()) {
       return fullModel[this.value];
     } else {
       const childOne = this.children[0].isTrue(model);
@@ -102,6 +123,19 @@ Logic.isSat = function(wff, returnModel) {
   const models = this._generateModels(wff);
   return this._checkModels(parsedWff, models, returnModel);
 };
+
+Logic.normalize = function(wff) {
+  const parsed = Logic._parse(wff);
+  if (!parsed) {
+    return;
+  }
+  const normalizedString = parsed.stringify();
+  if (typeof wff === 'string') {
+    return normalizedString;
+  } else if (wff instanceof Array) {
+    return this._parseString(normalizedString);
+  }
+}
 
 Logic._checkModels = function(parsedWff, models, returnModel) {
   for (let i = 0; i < models.length; i++) {
@@ -398,5 +432,7 @@ Logic._ensureIsLegal = function(wff) {
 export const isTrue = Logic.isTrue.bind(Logic);
 
 export const isSat = Logic.isSat.bind(Logic);
+
+export const normalize = Logic.normalize.bind(Logic);
 
 export default Logic;

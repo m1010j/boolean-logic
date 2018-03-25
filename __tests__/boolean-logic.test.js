@@ -1,6 +1,6 @@
 jest.unmock('../boolean-logic.js');
 
-import Logic, { isTrue, isSat } from '../boolean-logic.js';
+import Logic, { isTrue, isSat, normalize } from '../boolean-logic.js';
 
 describe('isTrue', () => {
   it("evauates 't' to true without a model", () => {
@@ -77,10 +77,10 @@ describe('isTrue', () => {
   it('also takes arrays of strings as arguments', () => {
     expect(isTrue(['N', 'N', 't'])).toBe(true);
   });
-  it("returns undefined for strings that aren't well-formed", () => {
+  it("returns undefined for arguments that aren't well-formed", () => {
     expect(isTrue('At')).toBe(undefined);
   });
-  it('returns undefined for strings that contain unknown vocabulary', () => {
+  it('throws error for arguments that contain unknown vocabulary', () => {
     function error() {
       isTrue('tCt');
     }
@@ -116,10 +116,10 @@ describe('isSat', () => {
     it('also takes arrays of strings as arguments', () => {
       expect(isSat(['N', 'N', 't'])).toBe(true);
     });
-    it("returns undefined for strings that aren't well-formed", () => {
+    it("returns undefined for arguments that aren't well-formed", () => {
       expect(isSat('At')).toBe(undefined);
     });
-    it('returns undefined for strings that contain unknown vocabulary', () => {
+    it('throws error for arguments that contain unknown vocabulary', () => {
       function error() {
         isSat('tCt');
       }
@@ -146,11 +146,56 @@ describe('isSat', () => {
   });
 });
 
+describe('normalize', () => {
+  describe('when given a string', () => {
+    it('returns a string with missing parentheses added', () => {
+      expect(normalize('NN1')).toEqual('(N(N1))');
+      expect(normalize('1A2A3')).toEqual('(1A(2A3))');
+    });
+    it('returns original string if no parentheses missing', () => {
+      expect(normalize('((1A2)A3)')).toEqual('((1A2)A3)');
+    });
+    it("returns undefined for arguments that aren't well-formed", () => {
+      expect(normalize('((1A2)A)')).toEqual(undefined);
+    });
+    it('throws error for arguments that contain unknown vocabulary', () => {
+      function error() {
+        normalize('tCt');
+      }
+      expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+    });
+    it("throws error for arguments that aren't strings or arrays", () => {
+      function error() {
+        normalize({});
+      }
+      expect(error).toThrow('Argument must be either a string or an array');
+    });
+  });
+  describe('when given an array', () => {
+    it('returns an array with missing parentheses added', () => {
+      expect(normalize([
+          'N',
+          'N',
+          '1',
+        ])).toEqual(['(', 'N', '(', 'N', '1', ')', ')']);
+    });
+    it('throws error for arguments that contain unknown vocabulary', () => {
+      function error() {
+        normalize(['t', 'C', 't']);
+      }
+      expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+    });
+  });
+})
+
 describe('Logic', () => {
   it("has an 'isTrue' property", () => {
     expect(Logic.isTrue).toBeTruthy();
   });
   it("has an 'isSat' property", () => {
     expect(Logic.isSat).toBeTruthy();
+  });
+  it("has a 'normalize' property", () => {
+    expect(Logic.normalize).toBeTruthy();
   });
 });
