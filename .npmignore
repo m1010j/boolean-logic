@@ -1,2 +1,8 @@
 __tests__
 .babelrc
+.eslintrc
+.prettierignore
+.prettierrc
+webpack.config.js
+experimental/
+.vscode/

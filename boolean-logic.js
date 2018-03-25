@@ -1,4 +1,4 @@
-import Logic from './lib/class_util';
+import Logic from './src/class_util';
 
 Logic.isTrue = function(wff, model) {
   const parsed = Logic._parse(wff);
@@ -53,4 +53,4 @@ export const reduce = Logic.reduce.bind(Logic);
 
 export default Logic;
 
-window.Logic = Logic;
+// window.Logic = Logic;

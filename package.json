@@ -1,22 +1,31 @@
 {
   "name": "boolean-logic",
   "version": "1.0.15",
-  "description":
-    "A lightweight package for evaluating formulas of Boolean logic",
+  "description": "A lightweight package for evaluating formulas of Boolean logic",
   "main": "boolean-logic.js",
   "dependencies": {},
   "devDependencies": {
-    "babel-preset-env": "*",
-    "jest": "*"
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "jest": "*",
+    "webpack": "^4.2.0",
+    "webpack-cli": "^2.0.13"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "webpack --watch",
+    "postinstall": "webpack"
   },
   "jest": {
     "automock": true
   },
   "repository": "git+https://github.com/m1010j/boolean-logic.git",
-  "keywords": ["logic", "boolean", "satisfiability"],
+  "keywords": [
+    "logic",
+    "boolean",
+    "satisfiability"
+  ],
   "author": "Matthias Jenny",
   "email": "matthiascjenny@gmail.com",
   "url": "http://www.matthiasjenny.com",

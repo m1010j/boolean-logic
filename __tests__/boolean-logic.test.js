@@ -1,6 +1,6 @@
 jest.unmock('../boolean-logic.js');
-jest.unmock('../lib/logic.js');
-jest.unmock('../lib/class_util.js');
+jest.unmock('../src/logic.js');
+jest.unmock('../src/class_util.js');
 
 import Logic, { isTrue, isSat, normalize, reduce } from '../boolean-logic.js';
 
