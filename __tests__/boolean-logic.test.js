@@ -1,4 +1,6 @@
 jest.unmock('../boolean-logic.js');
+jest.unmock('../lib/logic.js');
+jest.unmock('../lib/class_util.js');
 
 import Logic, { isTrue, isSat, normalize, reduce } from '../boolean-logic.js';
 
@@ -98,7 +100,9 @@ describe('isTrue', () => {
       function error() {
         isTrue(['t', 'C', 't']);
       }
-      expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+      expect(error).toThrow(
+        "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+      );
     });
   });
   it("throws error for arguments that aren't strings or arrays", () => {
@@ -137,7 +141,9 @@ describe('isSat', () => {
         function error() {
           isSat('tCt');
         }
-        expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+        expect(error).toThrow(
+          "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+        );
       });
     });
     describe('when asked to return model', () => {
@@ -163,19 +169,21 @@ describe('isSat', () => {
         function error() {
           isSat(['t', 'C', 't']);
         }
-        expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+        expect(error).toThrow(
+          "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+        );
       });
     });
     describe('when asked to return model', () => {
       it('returns model in which the argument is true', () => {
-        expect(isSat(['(', '1', 'A', '2', 'A', '3', ')', 'X', '4'], true)).toEqual(
-          {
-            1: false,
-            2: true,
-            3: true,
-            4: true,
-          }
-        );
+        expect(
+          isSat(['(', '1', 'A', '2', 'A', '3', ')', 'X', '4'], true)
+        ).toEqual({
+          1: false,
+          2: true,
+          3: true,
+          4: true,
+        });
       });
     });
   });
@@ -203,22 +211,30 @@ describe('normalize', () => {
       function error() {
         normalize('tCt');
       }
-      expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+      expect(error).toThrow(
+        "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+      );
     });
   });
   describe('when given an array', () => {
     it('returns an array with missing parentheses added', () => {
-      expect(normalize([
-          'N',
-          'N',
-          '1',
-        ])).toEqual(['(', 'N', '(', 'N', '1', ')', ')']);
+      expect(normalize(['N', 'N', '1'])).toEqual([
+        '(',
+        'N',
+        '(',
+        'N',
+        '1',
+        ')',
+        ')',
+      ]);
     });
     it('throws error for arguments that contain unknown vocabulary', () => {
       function error() {
         normalize(['t', 'C', 't']);
       }
-      expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+      expect(error).toThrow(
+        "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+      );
     });
   });
   it("throws error for arguments that aren't strings or arrays", () => {
@@ -227,7 +243,7 @@ describe('normalize', () => {
     }
     expect(error).toThrow('Argument must be either a string or an array');
   });
-})
+});
 
 describe('reduce', () => {
   describe('when given a string', () => {
@@ -246,23 +262,22 @@ describe('reduce', () => {
       function error() {
         reduce('tCt');
       }
-      expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+      expect(error).toThrow(
+        "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+      );
     });
   });
   describe('when given an array', () => {
     it('returns an array with missing parentheses added', () => {
-      expect(reduce([
-          '(',
-          'N',
-          '1',
-          ')',
-        ])).toEqual(['(', 'N', '1', ')']);
+      expect(reduce(['(', 'N', '1', ')'])).toEqual(['(', 'N', '1', ')']);
     });
     it('throws error for arguments that contain unknown vocabulary', () => {
       function error() {
         reduce(['t', 'C', 't']);
       }
-      expect(error).toThrow("Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)");
+      expect(error).toThrow(
+        "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+      );
     });
   });
   it("throws error for arguments that aren't strings or arrays", () => {
@@ -271,7 +286,7 @@ describe('reduce', () => {
     }
     expect(error).toThrow('Argument must be either a string or an array');
   });
-})
+});
 
 describe('Logic', () => {
   it("has an 'isTrue' property", () => {
