@@ -12,7 +12,8 @@ class Logic {
 
     if (this.parent) {
       const children = this.parent.children;
-      children._remove(this);
+      const thisIndex = children.indexOf(this);
+      children.splice(thisIndex, 1);
     }
 
     this.parent = parent;
@@ -58,13 +59,90 @@ class Logic {
     return false;
   }
 
+  dup() {
+    return this.constructor._parse(this.stringify());
+  }
+
+  reduce() {
+    if (this.children.length === 0) {
+      return this.dup();
+    } else if (this.value === "N") {
+      const negation = new this.constructor('N');
+      negation.addChild(this.children[0].reduce());
+      return negation;
+    } else if (this.value === "O") {
+      const disjunction = new this.constructor('O');
+      disjunction.addChild(this.children[0].reduce());
+      disjunction.addChild(this.children[1].reduce());
+      return disjunction;
+    } else if (this.value === "A") {
+      const firstNegation = new this.constructor("N");
+      const secondNegation = new this.constructor("N");
+      const thirdNegation = new this.constructor("N");
+      const disjunction = new this.constructor("O");
+      const firstChildReduced = this.children[0].reduce();
+      const secondChildReduced = this.children[1].reduce();
+      firstNegation.addChild(firstChildReduced);
+      secondNegation.addChild(secondChildReduced);
+      disjunction.addChild(firstNegation);
+      disjunction.addChild(secondNegation);
+      thirdNegation.addChild(disjunction);
+      return thirdNegation;
+    } else if (this.value === "X") {
+      const firstChildReduced1 = this.children[0].reduce();
+      const secondChildReduced1 = this.children[1].reduce();
+      const firstChildReduced2 = firstChildReduced1.dup();
+      const secondChildReduced2 = secondChildReduced1.dup();
+      const disjunction = new this.constructor("O");
+      disjunction.addChild(firstChildReduced1);
+      disjunction.addChild(secondChildReduced1);
+      const firstConjunction = new this.constructor('A');
+      firstConjunction.addChild(firstChildReduced2);
+      firstConjunction.addChild(secondChildReduced2);
+      const negation = new this.constructor('N');
+      negation.addChild(firstConjunction);
+      const secondConjunction = new this.constructor('A');
+      secondConjunction.addChild(disjunction);
+      secondConjunction.addChild(negation);
+      return secondConjunction.reduce();
+    } else if (this.value === "T") {
+      const firstChildReduced = this.children[0].reduce();
+      const secondChildReduced = this.children[1].reduce();
+      const negation = new this.constructor('N');
+      negation.addChild(firstChildReduced);
+      const disjunction = new this.constructor('O');
+      disjunction.addChild(negation);
+      disjunction.addChild(secondChildReduced);
+      return disjunction;
+    } else if (this.value === "B") {
+      const firstChildReduced1 = this.children[0].reduce();
+      const secondChildReduced1 = this.children[1].reduce();
+      const firstChildReduced2 = firstChildReduced1.dup();
+      const secondChildReduced2 = secondChildReduced1.dup();
+      const negation1 = new this.constructor('N');
+      negation1.addChild(firstChildReduced1);
+      const disjunction1 = new this.constructor('O');
+      disjunction1.addChild(negation1);
+      disjunction1.addChild(secondChildReduced1);
+      const negation2 = new this.constructor('N');
+      negation2.addChild(secondChildReduced2);
+      const disjunction2 = new this.constructor('O');
+      disjunction2.addChild(negation2);
+      disjunction2.addChild(firstChildReduced2);
+      const conjunction = new this.constructor('A');
+      conjunction.addChild(disjunction1);
+      conjunction.addChild(disjunction2);
+      return conjunction.reduce();
+    }
+  }
+
   stringify() {
     if (this.children.length === 0) {
       return this.value;
     } else if (this.children.length === 1) {
       const child0String = this.children[0].stringify();
       if (!child0String) {
-        return
+        return;
       } else {
         return `(${this.value}${child0String})`;
       }
@@ -134,6 +212,19 @@ Logic.normalize = function(wff) {
     return normalizedString;
   } else if (wff instanceof Array) {
     return this._parseString(normalizedString);
+  }
+};
+
+Logic.reduce = function(wff) {
+  const parsed = Logic._parse(wff);
+  if (!parsed) {
+    return;
+  }
+  const reducedString = parsed.reduce().stringify();
+  if (typeof wff === 'string') {
+    return reducedString;
+  } else if (wff instanceof Array) {
+    return this._parseString(reducedString);
   }
 }
 
@@ -435,4 +526,8 @@ export const isSat = Logic.isSat.bind(Logic);
 
 export const normalize = Logic.normalize.bind(Logic);
 
+export const reduce = Logic.reduce.bind(Logic);
+
 export default Logic;
+
+window.Logic = Logic;
