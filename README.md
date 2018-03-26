@@ -15,7 +15,7 @@ A string is considered a well-formed formula (wff) if is obtained from the follo
 
 In other words, `'t'` and `'f'` are atomic sentences&mdash;`'t'` is always true, `'f'` always false&mdash;and numerals are atomic sentences (i.e.`` `${n}` ``, for `n` an integer). `'N'` is the only unary connective; it is interpreted as negation. `'A'`, `'O'`, `'X'`, `'T'`, and `'B'` are binary connectives; they are interpreted as conjunction, inclusive disjunction, exclusive disjunction, the material conditional, and the material biconditional.
 
-As is usual, outer parentheses can be dropped, as can parentheses that are used to stack identical connectives (with the exception of `'T'`). So, if `` `(${p})` `` is a wff, then so is `p`; and if `p`, `q`, and `r` are wffs, then so are `` `(NN${p})` ``, `` `(${p}A${q}A${R})` ``, `` `(${p}O${q}O${R})` ``, `` `(${p}X${q}X${R})` ``, and `` `(${p}B${q}B${R})` ``. However, `boolean-logic` also exports the function `normalize` which transforms a wff to a wff with parentheses that meet the strict rules above.
+As is usual, outer parentheses can be dropped, as can parentheses that are used to stack identical connectives (with the exception of `'T'`). So, if `` `(${p})` `` is a wff, then so is `p`; and if `p`, `q`, and `r` are wffs, then so are `` `(NN${p})` ``, `` `(${p}A${q}A${R})` ``, `` `(${p}O${q}O${R})` ``, `` `(${p}X${q}X${R})` ``, and `` `(${p}B${q}B${R})` ``. However, `boolean-logic` also exports a function `normalize` that transforms a wff to a wff with parentheses that meet the strict rules above, and a function `reduce` that returns an equivalent wff containing only negations and disjunctions.
 
 For `array` an array of strings, `array` is a wff if `array.join('')` is a wff.
 
@@ -66,7 +66,7 @@ isSat(wff[, returnModel]);
 ### Examples
 
 ```javascript
-import { isTrue, isSat } from 'boolean-logic';
+import { isTrue, isSat, normalize, reduce } from 'boolean-logic';
 
 isTrue('t'); // true
 isTrue('f'); // false
@@ -84,8 +84,11 @@ isSat('(1O2)', true); // { 1: true, 2: true }
 isTrue('At'); // undefined
 isSat('A1'); // undefined
 
-normalize('NN1') // '(N(N1))'
-normalize(['N', 'N', '1']) // ['(', 'N', '(', 'N', '1', ')', ')']
+normalize('NN1'); // '(N(N1))'
+normalize(['N', 'N', '1']); // ['(', 'N', '(', 'N', '1', ')', ')']
+
+reduce('(1A2)'); // '(N((N1)O(N2)))'
+reduce(['(', '1', 'A', '2', ')']); // ['(', 'N', '(', '(', 'N', '1', ')', 'O', '(', 'N', '2', ')', ')', ')']
 ```
 
 The educational logic game [Andor](http://www.andor.fun) is powered by the `boolean-logic` package.
