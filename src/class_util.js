@@ -292,4 +292,40 @@ Logic._ensureIsLegal = function(wff) {
   }
 };
 
+Logic._modelsAreEqual = function(first, second) {
+  const firstKeys = Object.keys(first).sort();
+  const secondKeys = Object.keys(second).sort();
+  if (!this._arraysAreEqual(firstKeys, secondKeys)) {
+    return false;
+  }
+  for (let key in first) {
+    if (first[key] !== second[key]) {
+      return false;
+    }
+  }
+  return true;
+};
+
+Logic._modelsAreConsistent = function(first, second) {
+  for (let key in first) {
+    if (
+      first[key] !== undefined &&
+      second[key] !== undefined &&
+      first[key] !== second[key]
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
+Logic._arraysAreEqual = function(first, second) {
+  for (let i = 0; i < first.length; i++) {
+    if (first[i] !== second[i]) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export default Logic;

@@ -181,4 +181,117 @@ Logic.prototype.isTrue = function(model) {
   }
 };
 
+Logic.prototype.supposeIs = function(
+  boolean,
+  partialModel = {},
+  modelsTried = []
+) {
+  const reduced = this.reduce();
+  if (reduced.children.length === 0) {
+    if (reduced.value === 't' && boolean === true) {
+      return { t: boolean };
+    } else if (reduced.value === 'f' && boolean === false) {
+      return { f: boolean };
+    } else if (reduced.value === 't' && boolean === false) {
+      return;
+    } else if (reduced.value === 'f' && boolean === true) {
+      return;
+    } else {
+      if (partialModel[reduced.value] === boolean) {
+        return partialModel;
+      } else if (partialModel[reduced.value] === !boolean) {
+        return;
+      } else {
+        return Object.assign({}, partialModel, {
+          [reduced.value]: boolean,
+        });
+      }
+    }
+  } else if (reduced.value === 'N') {
+    let negatumValueInModel;
+    try {
+      negatumValueInModel = reduced.children[0].isTrue(partialModel);
+    } catch (error) {}
+    if (negatumValueInModel === boolean) {
+      return;
+    } else {
+      return reduced.children[0].supposeIs(!boolean, partialModel);
+    }
+  } else if (reduced.value === 'O') {
+    let firstDisjunctValueInModel;
+    let secondDisjunctValueInModel;
+    try {
+      firstDisjunctValueInModel = reduced.children[0].isTrue(partialModel);
+      secondDisjunctValueInModel = reduced.children[1].isTrue(partialModel);
+    } catch (error) {}
+    if (
+      typeof firstDisjunctValueInModel === 'boolean' &&
+      typeof secondDisjunctValueInModel === 'boolean' &&
+      (firstDisjunctValueInModel || secondDisjunctValueInModel) !== boolean
+    ) {
+      return;
+    } else if (
+      typeof firstDisjunctValueInModel === 'boolean' &&
+      typeof secondDisjunctValueInModel === 'boolean' &&
+      (firstDisjunctValueInModel || secondDisjunctValueInModel) === boolean
+    ) {
+      return partialModel;
+    } else if (
+      firstDisjunctValueInModel === undefined &&
+      typeof secondDisjunctValueInModel === 'boolean'
+    ) {
+      if (secondDisjunctValueInModel === false) {
+        if (boolean === true) {
+          const secondModel = reduced.children[0].supposeIs(true, partialModel);
+          if (secondModel) {
+            return Object.assign({}, partialModel, secondModel);
+          }
+        } else {
+          const secondModel = reduced.children[0].supposeIs(
+            false,
+            partialModel
+          );
+          if (secondModel) {
+            return Object.assign({}, partialModel, secondModel);
+          }
+        }
+      }
+    } else if (
+      secondDisjunctValueInModel === undefined &&
+      typeof firstDisjunctValueInModel === 'boolean'
+    ) {
+      if (firstDisjunctValueInModel === false) {
+        if (boolean === true) {
+          const secondModel = reduced.children[1].supposeIs(true, partialModel);
+          if (secondModel) {
+            return Object.assign({}, partialModel, secondModel);
+          }
+        } else {
+          const secondModel = reduced.children[1].supposeIs(
+            false,
+            partialModel
+          );
+          if (secondModel) {
+            return Object.assign({}, partialModel, secondModel);
+          }
+        }
+      }
+    } else if (
+      firstDisjunctValueInModel === undefined &&
+      secondDisjunctValueInModel === undefined
+    ) {
+      if (!boolean) {
+        const secondModel = reduced.children[0].supposeIs(false, partialModel);
+        if (secondModel) {
+          const thirdModel = reduced.children[1].supposeIs(false, partialModel);
+          if (thirdModel) {
+            return Object.assign({}, partialModel, secondModel, thirdModel);
+          }
+        }
+      } else {
+      }
+    }
+  }
+};
+
 export default Logic;
