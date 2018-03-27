@@ -322,24 +322,24 @@ Logic.prototype.supposeTrue = function() {
                 nodeOpenPossibilities &&
                 nodeOpenPossibilities.includes([true, true])
               ) {
-                model[nodeString].snapshot = merge({}, model);
                 let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
                   true,
                   true,
                 ]);
                 nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
                 nodeOpenPossibilities.push([true, false]);
+                model[nodeString].snapshot = merge({}, model);
                 model[secondDisjunctValueInModel] = { truthValue: true };
               } else if (
                 nodeOpenPossibilities &&
                 nodeOpenPossibilities.includes([true, false])
               ) {
-                model[nodeString].snapshot = merge({}, model);
                 let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
                   true,
                   false,
                 ]);
                 nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                model[nodeString].snapshot = merge({}, model);
                 model[secondDisjunctValueInModel] = { truthValue: false };
               } else {
                 model = undefined;
@@ -352,24 +352,24 @@ Logic.prototype.supposeTrue = function() {
                 nodeOpenPossibilities &&
                 nodeOpenPossibilities.includes([true, true])
               ) {
-                model[nodeString].snapshot = merge({}, model);
                 let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
                   true,
                   true,
                 ]);
                 nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
                 nodeOpenPossibilities.push([false, true]);
+                model[nodeString].snapshot = merge({}, model);
                 model[firstDisjunctValueInModel] = { truthValue: true };
               } else if (
                 nodeOpenPossibilities &&
                 nodeOpenPossibilities.includes([false, true])
               ) {
-                model[nodeString].snapshot = merge({}, model);
                 let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
                   true,
                   false,
                 ]);
                 nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                model[nodeString].snapshot = merge({}, model);
                 model[firstDisjunctValueInModel] = { truthValue: false };
               } else {
                 model = undefined;
@@ -382,7 +382,6 @@ Logic.prototype.supposeTrue = function() {
                 nodeOpenPossibilities &&
                 nodeOpenPossibilities.includes([true, true])
               ) {
-                model[nodeString].snapshot = merge({}, model);
                 let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
                   true,
                   true,
@@ -390,30 +389,31 @@ Logic.prototype.supposeTrue = function() {
                 nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
                 nodeOpenPossibilities.push([true, false]);
                 nodeOpenPossibilities.push([false, true]);
+                model[nodeString].snapshot = merge({}, model);
                 model[firstDisjunctValueInModel] = { truthValue: true };
                 model[secondDisjunctValueInModel] = { truthValue: true };
               } else if (
                 nodeOpenPossibilities &&
                 nodeOpenPossibilities.includes([true, false])
               ) {
-                model[nodeString].snapshot = merge({}, model);
                 let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
                   true,
                   false,
                 ]);
                 nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                model[nodeString].snapshot = merge({}, model);
                 model[firstDisjunctValueInModel] = { truthValue: true };
                 model[secondDisjunctValueInModel] = { truthValue: false };
               } else if (
                 nodeOpenPossibilities &&
                 nodeOpenPossibilities.includes([false, true])
               ) {
-                model[nodeString].snapshot = merge({}, model);
                 let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
                   false,
                   true,
                 ]);
                 nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                model[nodeString].snapshot = merge({}, model);
                 model[firstDisjunctValueInModel] = { truthValue: false };
                 model[secondDisjunctValueInModel] = { truthValue: true };
               } else {
