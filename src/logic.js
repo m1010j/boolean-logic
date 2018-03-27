@@ -160,6 +160,186 @@ Logic.prototype.stringify = function() {
   }
 };
 
+Logic.prototype.forEach = function(callback) {
+  let nodes = [this];
+  while (nodes.length > 0) {
+    let node = nodes.shift();
+    callback(node);
+    nodes = nodes.concat(node.children);
+  }
+};
+
+Logic.prototype.length = function() {
+  let num = 0;
+  this.forEach(node => {
+    num += 1;
+  });
+  return num;
+};
+
+Logic.prototype.nthNode = function(n) {
+  let nodes = [this];
+  let current = -1;
+  let node;
+  while (current < n) {
+    current += 1;
+    node = nodes.shift();
+    if (node.children) {
+      nodes = nodes.concat(node.children);
+    }
+  }
+  return node;
+};
+
+Logic.prototype.root = function() {
+  let root = this;
+  while (root.parent) {
+    root = root.parent;
+  }
+  return root;
+};
+
+Logic.prototype.findClosestAncestorStringWithOpenHistory = function(model) {
+  let parent = this.parent;
+  while (true) {
+    if (!parent) {
+      return;
+    } else {
+      if (parent.value === 'O') {
+        let parentString = parent.stringify();
+        let parentValueInModel = model[parentString];
+        if (!parentValueInModel) {
+          parent = parent.parent;
+        } else if (
+          !parentValueInModel.history ||
+          parentValueInModel.history.length < 4
+        ) {
+          return parentString;
+        } else {
+          parent = parent.parent;
+        }
+      } else {
+        parent = parent.parent;
+      }
+    }
+  }
+};
+
+Logic.prototype.findIdx = function(str) {
+  const length = this.length();
+  for (let i = 0; i < length; i++) {
+    if (this.nthNode(i).stringify() === str) {
+      return i;
+    }
+  }
+};
+
+Logic.prototype.findAncestorIdxWithOpenHistory = function(model) {
+  const closestAncestorString = this.findClosestAncestorStringWithOpenHistory(
+    model
+  );
+  if (closestAncestorString) {
+    return this.root().findIdx(closestAncestorString);
+  }
+};
+
+Logic.prototype.supposeTrue = function() {
+  let model = {
+    [this.stringify()]: { truthValue: true },
+    t: { truthValue: true },
+    f: { truthValue: false },
+  };
+  this.forEach(node => {
+    if (model) {
+      let nodeString = node.stringify();
+      let nodeValueInModel;
+      if (model[nodeString] !== undefined) {
+        nodeValueInModel = model[nodeString].truthValue;
+      }
+      if (typeof nodeValueInModel === 'boolean') {
+        if (node.value === 'N') {
+          let negatumString = node.children[0].stringify();
+          let negatumValueInModel;
+          if (model[negatumString] !== undefined) {
+            negatumValueInModel = model[negatumString].truthValue;
+          }
+          if (negatumValueInModel === nodeValueInModel) {
+            model = undefined;
+          } else if (negatumValueInModel === undefined) {
+            model[negatumString] = { truthValue: !nodeValueInModel };
+          }
+        } else if (node.value === 'O') {
+          let firstDisjunctString = node.children[0].stringify();
+          let secondDisjunctString = node.children[1].stringify();
+          let firstDisjunctValueInModel;
+          if (model[firstDisjunctString] !== undefined) {
+            firstDisjunctValueInModel = model[firstDisjunctString].truthValue;
+          }
+          let secondDisjunctValueInModel;
+          if (model[secondDisjunctString] !== undefined) {
+            secondDisjunctValueInModel = model[secondDisjunctString].truthValue;
+          }
+          let firstDisjunctHistory =
+            model[firstDisjunctString] && model[firstDisjunctString].history;
+          let secondDisjunctHistory =
+            model[secondDisjunctString] && model[secondDisjunctString].history;
+          if (!nodeValueInModel) {
+            if (
+              firstDisjunctValueInModel === true ||
+              secondDisjunctValueInModel === true
+            ) {
+              model = undefined;
+            } else {
+              model[firstDisjunctString] = { truthValue: false };
+              model[secondDisjunctString] = { truthValue: false };
+              model[nodeString].history.push([false, false]);
+            }
+          } else {
+            if (
+              firstDisjunctValueInModel === false &&
+              secondDisjunctValueInModel === false
+            ) {
+              model = undefined;
+            } else if (
+              firstDisjunctValueInModel === false &&
+              secondDisjunctValueInModel === undefined
+            ) {
+              model[secondDisjunctValueInModel] = { truthValue: true };
+              model[nodeString].history.push([false, true]);
+            } else if (
+              firstDisjunctValueInModel === undefined &&
+              secondDisjunctValueInModel === false
+            ) {
+              model[firstDisjunctValueInModel] = { truthValue: true };
+              model[nodeString].history.push([true, false]);
+              // TODO: check the right cases, push the right things to history, findAncestorIdxWithOpenHistory, change forEach to for, using nthNode, reset Idx
+              // } else if (
+              //   firstDisjunctValueInModel === true &&
+              //   secondDisjunctValueInModel === undefined
+              // ) {
+              //   if (!secondDisjunctHistory.includes([true, true])) {
+              //     model[secondDisjunctValueInModel] = { truthValue: true };
+              //   } else {
+              //     model[secondDisjunctValueInModel] = { truthValue: false };
+              //   }
+              // } else if (
+              //   secondDisjunctValueInModel === true &&
+              //   firstDisjunctValueInModel === undefined
+              // ) {
+              //   if (!firstDisjunctHistory.includes(true)) {
+              //     model[firstDisjunctValueInModel] = { truthValue: true };
+              //   } else {
+              //     model[firstDisjunctValueInModel] = { truthValue: false };
+              //   }
+            }
+          }
+        }
+      }
+    }
+  });
+  return model;
+};
+
 Logic.prototype.isTrue = function(model) {
   model = model || {};
   const modelValues = Object.keys(model).map(key => model[key]);
