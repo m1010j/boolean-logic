@@ -1,3 +1,5 @@
+import { merge } from 'lodash';
+
 class Logic {
   constructor(value) {
     this.value = value;
@@ -199,7 +201,9 @@ Logic.prototype.root = function() {
   return root;
 };
 
-Logic.prototype.findClosestAncestorStringWithOpenHistory = function(model) {
+Logic.prototype.findClosestAncestorStringWithOpenPossibilities = function(
+  model
+) {
   let parent = this.parent;
   while (true) {
     if (!parent) {
@@ -211,8 +215,8 @@ Logic.prototype.findClosestAncestorStringWithOpenHistory = function(model) {
         if (!parentValueInModel) {
           parent = parent.parent;
         } else if (
-          !parentValueInModel.history ||
-          parentValueInModel.history.length < 4
+          parentValueInModel.openPossibilities &&
+          parentValueInModel.history.length > 0
         ) {
           return parentString;
         } else {
@@ -234,8 +238,8 @@ Logic.prototype.findIdx = function(str) {
   }
 };
 
-Logic.prototype.findAncestorIdxWithOpenHistory = function(model) {
-  const closestAncestorString = this.findClosestAncestorStringWithOpenHistory(
+Logic.prototype.findAncestorIdxWithOpenPossibilities = function(model) {
+  const closestAncestorString = this.findClosestAncestorStringWithOpenPossibilities(
     model
   );
   if (closestAncestorString) {
@@ -255,6 +259,10 @@ Logic.prototype.supposeTrue = function() {
       let nodeValueInModel;
       if (model[nodeString] !== undefined) {
         nodeValueInModel = model[nodeString].truthValue;
+      }
+      let nodeOpenPossibilities;
+      if (model[nodeString] !== undefined) {
+        nodeOpenPossibilities = model[nodeString].openPossibilities;
       }
       if (typeof nodeValueInModel === 'boolean') {
         if (node.value === 'N') {
@@ -279,10 +287,6 @@ Logic.prototype.supposeTrue = function() {
           if (model[secondDisjunctString] !== undefined) {
             secondDisjunctValueInModel = model[secondDisjunctString].truthValue;
           }
-          let firstDisjunctHistory =
-            model[firstDisjunctString] && model[firstDisjunctString].history;
-          let secondDisjunctHistory =
-            model[secondDisjunctString] && model[secondDisjunctString].history;
           if (!nodeValueInModel) {
             if (
               firstDisjunctValueInModel === true ||
@@ -292,7 +296,6 @@ Logic.prototype.supposeTrue = function() {
             } else {
               model[firstDisjunctString] = { truthValue: false };
               model[secondDisjunctString] = { truthValue: false };
-              model[nodeString].history.push([false, false]);
             }
           } else {
             if (
@@ -305,32 +308,117 @@ Logic.prototype.supposeTrue = function() {
               secondDisjunctValueInModel === undefined
             ) {
               model[secondDisjunctValueInModel] = { truthValue: true };
-              model[nodeString].history.push([false, true]);
             } else if (
               firstDisjunctValueInModel === undefined &&
               secondDisjunctValueInModel === false
             ) {
               model[firstDisjunctValueInModel] = { truthValue: true };
-              model[nodeString].history.push([true, false]);
-              // TODO: check the right cases, push the right things to history, findAncestorIdxWithOpenHistory, change forEach to for, using nthNode, reset Idx
-              // } else if (
-              //   firstDisjunctValueInModel === true &&
-              //   secondDisjunctValueInModel === undefined
-              // ) {
-              //   if (!secondDisjunctHistory.includes([true, true])) {
-              //     model[secondDisjunctValueInModel] = { truthValue: true };
-              //   } else {
-              //     model[secondDisjunctValueInModel] = { truthValue: false };
-              //   }
-              // } else if (
-              //   secondDisjunctValueInModel === true &&
-              //   firstDisjunctValueInModel === undefined
-              // ) {
-              //   if (!firstDisjunctHistory.includes(true)) {
-              //     model[firstDisjunctValueInModel] = { truthValue: true };
-              //   } else {
-              //     model[firstDisjunctValueInModel] = { truthValue: false };
-              //   }
+              // TODO: change forEach to for, using nthNode, instead of model = undefined use findAncestorIdxWithOpenPossibilities, reset Idx
+            } else if (
+              firstDisjunctValueInModel === true &&
+              secondDisjunctValueInModel === undefined
+            ) {
+              if (
+                nodeOpenPossibilities &&
+                nodeOpenPossibilities.includes([true, true])
+              ) {
+                model[nodeString].snapshot = merge({}, model);
+                let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
+                  true,
+                  true,
+                ]);
+                nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                nodeOpenPossibilities.push([true, false]);
+                model[secondDisjunctValueInModel] = { truthValue: true };
+              } else if (
+                nodeOpenPossibilities &&
+                nodeOpenPossibilities.includes([true, false])
+              ) {
+                model[nodeString].snapshot = merge({}, model);
+                let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
+                  true,
+                  false,
+                ]);
+                nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                model[secondDisjunctValueInModel] = { truthValue: false };
+              } else {
+                model = undefined;
+              }
+            } else if (
+              secondDisjunctValueInModel === true &&
+              firstDisjunctValueInModel === undefined
+            ) {
+              if (
+                nodeOpenPossibilities &&
+                nodeOpenPossibilities.includes([true, true])
+              ) {
+                model[nodeString].snapshot = merge({}, model);
+                let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
+                  true,
+                  true,
+                ]);
+                nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                nodeOpenPossibilities.push([false, true]);
+                model[firstDisjunctValueInModel] = { truthValue: true };
+              } else if (
+                nodeOpenPossibilities &&
+                nodeOpenPossibilities.includes([false, true])
+              ) {
+                model[nodeString].snapshot = merge({}, model);
+                let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
+                  true,
+                  false,
+                ]);
+                nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                model[firstDisjunctValueInModel] = { truthValue: false };
+              } else {
+                model = undefined;
+              }
+            } else if (
+              firstDisjunctValueInModel === undefined &&
+              secondDisjunctValueInModel === undefined
+            ) {
+              if (
+                nodeOpenPossibilities &&
+                nodeOpenPossibilities.includes([true, true])
+              ) {
+                model[nodeString].snapshot = merge({}, model);
+                let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
+                  true,
+                  true,
+                ]);
+                nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                nodeOpenPossibilities.push([true, false]);
+                nodeOpenPossibilities.push([false, true]);
+                model[firstDisjunctValueInModel] = { truthValue: true };
+                model[secondDisjunctValueInModel] = { truthValue: true };
+              } else if (
+                nodeOpenPossibilities &&
+                nodeOpenPossibilities.includes([true, false])
+              ) {
+                model[nodeString].snapshot = merge({}, model);
+                let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
+                  true,
+                  false,
+                ]);
+                nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                model[firstDisjunctValueInModel] = { truthValue: true };
+                model[secondDisjunctValueInModel] = { truthValue: false };
+              } else if (
+                nodeOpenPossibilities &&
+                nodeOpenPossibilities.includes([false, true])
+              ) {
+                model[nodeString].snapshot = merge({}, model);
+                let currentPossibilityIdx = nodeOpenPossibilities.indexOf([
+                  false,
+                  true,
+                ]);
+                nodeOpenPossibilities.slice(currentPossibilityIdx, 1);
+                model[firstDisjunctValueInModel] = { truthValue: false };
+                model[secondDisjunctValueInModel] = { truthValue: true };
+              } else {
+                model = undefined;
+              }
             }
           }
         }
