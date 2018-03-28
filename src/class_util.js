@@ -1,4 +1,4 @@
-import Logic from './logic';
+import Logic from './short_truth_table_util';
 
 Logic._checkModels = function(parsedWff, models, returnModel) {
   for (let i = 0; i < models.length; i++) {
