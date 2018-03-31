@@ -1,5 +1,3 @@
-import { merge } from 'lodash';
-
 class Logic {
   constructor(value) {
     this.value = value;
