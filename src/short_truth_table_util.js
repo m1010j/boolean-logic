@@ -50,9 +50,11 @@ Logic.prototype.findIdx = function(str) {
 };
 
 Logic.prototype.supposeTrue = function() {
-  const length = this.length();
+  const reduced = this.reduce();
+
+  const length = reduced.length();
   let model = {
-    [this.stringify()]: { truthValue: true },
+    [reduced.stringify()]: { truthValue: true },
     t: { truthValue: true },
     f: { truthValue: false },
   };
@@ -69,7 +71,8 @@ Logic.prototype.supposeTrue = function() {
   let nodeOpenPossibilities;
 
   while (!model.busted && i < length) {
-    node = this.nthNode(i);
+    debugger;
+    node = reduced.nthNode(i);
     nodeString = node.stringify();
     if (model[nodeString] !== undefined) {
       nodeValueInModel = model[nodeString].truthValue;
@@ -84,11 +87,20 @@ Logic.prototype.supposeTrue = function() {
     i++;
   }
   if (!model.busted) {
-    return model;
+    return extractRealModel(model);
+  }
+
+  function extractRealModel() {
+    const realModel = {};
+    for (let key in model) {
+      if (Logic._isAtomic(key)) {
+        realModel[key] = model[key].truthValue;
+      }
+    }
+    return realModel;
   }
 
   function handleNegation() {
-    debugger;
     negatumString = node.children[0].stringify();
     if (model[negatumString] !== undefined) {
       negatumValueInModel = model[negatumString].truthValue;
@@ -96,7 +108,7 @@ Logic.prototype.supposeTrue = function() {
     if (negatumValueInModel === nodeValueInModel) {
       i = findAncestorIdxWithOpenPossibilities() - 1;
       if (isNaN(i)) {
-        return;
+        model.busted = true;
       }
     } else if (negatumValueInModel === undefined) {
       model[negatumString] = { truthValue: !nodeValueInModel };
@@ -286,7 +298,7 @@ Logic.prototype.supposeTrue = function() {
   function findAncestorIdxWithOpenPossibilities() {
     const closestAncestorString = findClosestAncestorStringWithOpenPossibilities();
     if (closestAncestorString) {
-      return this.root().findIdx(closestAncestorString);
+      return reduced.root().findIdx(closestAncestorString);
     }
   }
 
