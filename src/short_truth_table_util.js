@@ -19,25 +19,17 @@ Logic.prototype.length = function() {
 };
 
 Logic.prototype.nthNode = function(n) {
-  let nodes = [this];
-  let current = -1;
-  let node;
-  while (current < n) {
-    current += 1;
-    node = nodes.shift();
-    if (node.children) {
-      nodes = nodes.concat(node.children);
+  if (n === 0) return this;
+  const children = this.children;
+  for (let i = 0; i < children.length; i++) {
+    n--;
+    let result = children[i].nthNode(n);
+    if (result) {
+      return result;
+    } else {
+      n = n - children[i].length() + 1;
     }
   }
-  return node;
-};
-
-Logic.prototype.root = function() {
-  let root = this;
-  while (root.parent) {
-    root = root.parent;
-  }
-  return root;
 };
 
 Logic.prototype.findIdx = function(str) {
@@ -92,7 +84,7 @@ Logic.prototype.supposeTrue = function() {
   function extractRealModel() {
     const realModel = {};
     for (let key in model) {
-      if (Logic._isAtomic(key)) {
+      if (key !== 't' && key !== 'f' && Logic._isAtomic(key)) {
         realModel[key] = model[key].truthValue;
       }
     }
@@ -100,6 +92,7 @@ Logic.prototype.supposeTrue = function() {
   }
 
   function handleNegation() {
+    negatumValueInModel = undefined;
     negatumString = node.children[0].stringify();
     if (model[negatumString] !== undefined) {
       negatumValueInModel = model[negatumString].truthValue;
@@ -114,6 +107,8 @@ Logic.prototype.supposeTrue = function() {
   function handleDisjunction() {
     firstDisjunctString = node.children[0].stringify();
     secondDisjunctString = node.children[1].stringify();
+    firstDisjunctValueInModel = undefined;
+    secondDisjunctValueInModel = undefined;
     if (model[firstDisjunctString] !== undefined) {
       firstDisjunctValueInModel = model[firstDisjunctString].truthValue;
     }
@@ -123,7 +118,6 @@ Logic.prototype.supposeTrue = function() {
     if (model[nodeString] !== undefined) {
       nodeOpenPossibilities = model[nodeString].openPossibilities;
     }
-    debugger;
     if (!nodeValueInModel) {
       handleNodeFalse();
     } else {
@@ -146,20 +140,19 @@ Logic.prototype.supposeTrue = function() {
         firstDisjunctValueInModel === true &&
         secondDisjunctValueInModel === undefined
       ) {
+        addTrueTrue();
         handleTrueUndef();
       } else if (
         firstDisjunctValueInModel === undefined &&
         secondDisjunctValueInModel === true
       ) {
+        addTrueTrue();
         handleUndefTrue();
       } else if (
         firstDisjunctValueInModel === undefined &&
         secondDisjunctValueInModel === undefined
       ) {
-        if (!nodeOpenPossibilities) {
-          model[nodeString].openPossibilities = [[true, true]];
-          nodeOpenPossibilities = model[nodeString].openPossibilities;
-        }
+        addTrueTrue();
         handleUndefUndef();
       }
     }
@@ -173,6 +166,13 @@ Logic.prototype.supposeTrue = function() {
       } else {
         model[firstDisjunctString] = { truthValue: false };
         model[secondDisjunctString] = { truthValue: false };
+      }
+    }
+
+    function addTrueTrue() {
+      if (!nodeOpenPossibilities) {
+        model[nodeString].openPossibilities = [[true, true]];
+        nodeOpenPossibilities = model[nodeString].openPossibilities;
       }
     }
 
@@ -279,47 +279,31 @@ Logic.prototype.supposeTrue = function() {
     }
   }
 
-  function findAncestorIdxWithOpenPossibilities() {
-    const closestAncestorString = findClosestAncestorStringWithOpenPossibilities();
-    if (closestAncestorString) {
-      return reduced.root().findIdx(closestAncestorString);
-    }
-  }
-
-  function findClosestAncestorStringWithOpenPossibilities() {
-    let parent = node;
-    while (true) {
-      if (!parent) {
-        return;
-      } else {
-        if (parent.value === 'O') {
-          let parentString = parent.stringify();
-          let parentValueInModel = model[parentString];
-          if (
-            parentValueInModel.openPossibilities &&
-            parentValueInModel.openPossibilities.length > 0
-          ) {
-            return parentString;
-          } else {
-            parent = parent.parent;
-          }
-        } else {
-          parent = parent.parent;
+  function findClosestNodeAndIdxWithOpenPossibilities() {
+    for (let j = i; j >= 0; j--) {
+      let current = reduced.nthNode(j);
+      if (current.value === 'O') {
+        let currentString = current.stringify();
+        let currentValueInModel = model[currentString];
+        if (
+          currentValueInModel &&
+          currentValueInModel.openPossibilities &&
+          currentValueInModel.openPossibilities.length > 0
+        ) {
+          return { node: current, idx: j };
         }
       }
     }
   }
 
   function handleInconsistency() {
-    i = findAncestorIdxWithOpenPossibilities() - 1;
-    if (isNaN(i)) {
+    const closest = findClosestNodeAndIdxWithOpenPossibilities();
+    if (!closest) {
       model.busted = true;
     } else {
-      const ancestorString = node
-        .root()
-        .nthNode(i + 1)
-        .stringify();
-      model = model[ancestorString].snapshot;
+      i = closest.idx - 1;
+      const closestString = closest.node.stringify();
+      model = model[closestString].snapshot;
     }
   }
 };

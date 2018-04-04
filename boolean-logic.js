@@ -8,13 +8,26 @@ Logic.isTrue = function(wff, model) {
   return parsed.isTrue(model);
 };
 
-Logic.isSat = function(wff, returnModel) {
+Logic.isSat = function(wff, returnModel, bruteForce) {
   const parsedWff = Logic._parse(wff);
   if (!parsedWff) {
     return;
   }
-  const models = this._generateModels(wff);
-  return this._checkModels(parsedWff, models, returnModel);
+  if (bruteForce) {
+    const models = this._generateModels(wff);
+    return this._checkModels(parsedWff, models, returnModel);
+  } else {
+    const model = parsedWff.supposeTrue();
+    if (model) {
+      if (returnModel) {
+        return model;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
 };
 
 Logic.normalize = function(wff) {
