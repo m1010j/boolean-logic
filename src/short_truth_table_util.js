@@ -42,7 +42,8 @@ Logic.prototype.findIdx = function(str) {
 };
 
 Logic.prototype.supposeTrue = function() {
-  const reduced = this.reduce();
+  // const reduced = this.reduce();
+  const reduced = this;
 
   const length = reduced.length();
   let model = {
@@ -56,10 +57,10 @@ Logic.prototype.supposeTrue = function() {
   let nodeValueInModel;
   let negatumString;
   let negatumValueInModel;
-  let firstDisjunctString;
-  let secondDisjunctString;
-  let firstDisjunctValueInModel;
-  let secondDisjunctValueInModel;
+  let firstComponentString;
+  let secondComponentString;
+  let firstComponentValueInModel;
+  let secondComponentValueInModel;
   let nodeOpenPossibilities;
 
   while (!model.busted && i < length) {
@@ -73,6 +74,8 @@ Logic.prototype.supposeTrue = function() {
         handleNegation();
       } else if (node.value === 'O') {
         handleDisjunction();
+      } else if (node.value === 'X') {
+        handleXor();
       }
     }
     i++;
@@ -105,15 +108,15 @@ Logic.prototype.supposeTrue = function() {
   }
 
   function handleDisjunction() {
-    firstDisjunctString = node.children[0].stringify();
-    secondDisjunctString = node.children[1].stringify();
-    firstDisjunctValueInModel = undefined;
-    secondDisjunctValueInModel = undefined;
-    if (model[firstDisjunctString] !== undefined) {
-      firstDisjunctValueInModel = model[firstDisjunctString].truthValue;
+    firstComponentString = node.children[0].stringify();
+    secondComponentString = node.children[1].stringify();
+    firstComponentValueInModel = undefined;
+    secondComponentValueInModel = undefined;
+    if (model[firstComponentString] !== undefined) {
+      firstComponentValueInModel = model[firstComponentString].truthValue;
     }
-    if (model[secondDisjunctString] !== undefined) {
-      secondDisjunctValueInModel = model[secondDisjunctString].truthValue;
+    if (model[secondComponentString] !== undefined) {
+      secondComponentValueInModel = model[secondComponentString].truthValue;
     }
     if (model[nodeString] !== undefined) {
       nodeOpenPossibilities = model[nodeString].openPossibilities;
@@ -122,35 +125,35 @@ Logic.prototype.supposeTrue = function() {
       handleNodeFalse();
     } else {
       if (
-        firstDisjunctValueInModel === false &&
-        secondDisjunctValueInModel === false
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === false
       ) {
         handleInconsistency();
       } else if (
-        firstDisjunctValueInModel === false &&
-        secondDisjunctValueInModel === undefined
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === undefined
       ) {
-        model[secondDisjunctString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: true };
       } else if (
-        firstDisjunctValueInModel === undefined &&
-        secondDisjunctValueInModel === false
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === false
       ) {
-        model[firstDisjunctString] = { truthValue: true };
+        model[firstComponentString] = { truthValue: true };
       } else if (
-        firstDisjunctValueInModel === true &&
-        secondDisjunctValueInModel === undefined
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === undefined
       ) {
         addTrueTrue();
         handleTrueUndef();
       } else if (
-        firstDisjunctValueInModel === undefined &&
-        secondDisjunctValueInModel === true
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === true
       ) {
         addTrueTrue();
         handleUndefTrue();
       } else if (
-        firstDisjunctValueInModel === undefined &&
-        secondDisjunctValueInModel === undefined
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === undefined
       ) {
         addTrueTrue();
         handleUndefUndef();
@@ -159,13 +162,13 @@ Logic.prototype.supposeTrue = function() {
 
     function handleNodeFalse() {
       if (
-        firstDisjunctValueInModel === true ||
-        secondDisjunctValueInModel === true
+        firstComponentValueInModel === true ||
+        secondComponentValueInModel === true
       ) {
         handleInconsistency();
       } else {
-        model[firstDisjunctString] = { truthValue: false };
-        model[secondDisjunctString] = { truthValue: false };
+        model[firstComponentString] = { truthValue: false };
+        model[secondComponentString] = { truthValue: false };
       }
     }
 
@@ -188,7 +191,7 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         nodeOpenPossibilities.push([true, false]);
         model[nodeString].snapshot = merge({}, model);
-        model[secondDisjunctString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: true };
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [true, false])
@@ -199,7 +202,7 @@ Logic.prototype.supposeTrue = function() {
         ]);
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
-        model[secondDisjunctString] = { truthValue: false };
+        model[secondComponentString] = { truthValue: false };
       } else {
         handleInconsistency();
       }
@@ -217,7 +220,7 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         nodeOpenPossibilities.push([false, true]);
         model[nodeString].snapshot = merge({}, model);
-        model[firstDisjunctString] = { truthValue: true };
+        model[firstComponentString] = { truthValue: true };
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [false, true])
@@ -228,7 +231,7 @@ Logic.prototype.supposeTrue = function() {
         ]);
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
-        model[firstDisjunctString] = { truthValue: false };
+        model[firstComponentString] = { truthValue: false };
       } else {
         handleInconsistency();
       }
@@ -247,8 +250,8 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.push([true, false]);
         nodeOpenPossibilities.push([false, true]);
         model[nodeString].snapshot = merge({}, model);
-        model[firstDisjunctString] = { truthValue: true };
-        model[secondDisjunctString] = { truthValue: true };
+        model[firstComponentString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: true };
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [true, false])
@@ -259,8 +262,8 @@ Logic.prototype.supposeTrue = function() {
         ]);
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
-        model[firstDisjunctString] = { truthValue: true };
-        model[secondDisjunctString] = { truthValue: false };
+        model[firstComponentString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: false };
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [false, true])
@@ -271,10 +274,181 @@ Logic.prototype.supposeTrue = function() {
         ]);
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
-        model[firstDisjunctString] = { truthValue: false };
-        model[secondDisjunctString] = { truthValue: true };
+        model[firstComponentString] = { truthValue: false };
+        model[secondComponentString] = { truthValue: true };
       } else {
         handleInconsistency();
+      }
+    }
+  }
+
+  function handleXor() {
+    firstComponentString = node.children[0].stringify();
+    secondComponentString = node.children[1].stringify();
+    firstComponentValueInModel = undefined;
+    secondComponentValueInModel = undefined;
+    if (model[firstComponentString] !== undefined) {
+      firstComponentValueInModel = model[firstComponentString].truthValue;
+    }
+    if (model[secondComponentString] !== undefined) {
+      secondComponentValueInModel = model[secondComponentString].truthValue;
+    }
+    if (model[nodeString] !== undefined) {
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
+    }
+    if (!nodeValueInModel) {
+      handleNodeFalse();
+    } else {
+      handleNodeTrue();
+    }
+
+    function handleNodeFalse() {
+      if (
+        (firstComponentValueInModel === true &&
+          secondComponentValueInModel === false) ||
+        (firstComponentValueInModel === false &&
+          secondComponentValueInModel === true)
+      ) {
+        handleInconsistency();
+      } else if (
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === true
+      ) {
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === false
+      ) {
+        model[firstComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === undefined
+      ) {
+        addTrueTrue();
+        handleUndefUndef();
+      }
+
+      function addTrueTrue() {
+        if (!nodeOpenPossibilities) {
+          model[nodeString].openPossibilities = [[true, true]];
+          nodeOpenPossibilities = model[nodeString].openPossibilities;
+        }
+      }
+
+      function handleUndefUndef() {
+        if (
+          nodeOpenPossibilities &&
+          arrayIncludesArray(nodeOpenPossibilities, [true, true])
+        ) {
+          let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+            true,
+            true,
+          ]);
+          nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+          nodeOpenPossibilities.push([false, false]);
+          model[nodeString].snapshot = merge({}, model);
+          model[firstComponentString] = { truthValue: true };
+          model[secondComponentString] = { truthValue: true };
+        } else if (
+          nodeOpenPossibilities &&
+          arrayIncludesArray(nodeOpenPossibilities, [false, false])
+        ) {
+          let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+            false,
+            false,
+          ]);
+          nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+          model[nodeString].snapshot = merge({}, model);
+          model[firstComponentString] = { truthValue: false };
+          model[secondComponentString] = { truthValue: false };
+        } else {
+          handleInconsistency();
+        }
+      }
+    }
+
+    function handleNodeTrue() {
+      if (
+        (firstComponentValueInModel === true &&
+          secondComponentValueInModel === true) ||
+        (firstComponentValueInModel === false &&
+          secondComponentValueInModel === false)
+      ) {
+        handleInconsistency();
+      } else if (
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === true
+      ) {
+        model[firstComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === false
+      ) {
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === undefined
+      ) {
+        addTrueFalse();
+        handleUndefUndef();
+      }
+
+      function addTrueFalse() {
+        if (!nodeOpenPossibilities) {
+          model[nodeString].openPossibilities = [[true, false]];
+          nodeOpenPossibilities = model[nodeString].openPossibilities;
+        }
+      }
+
+      function handleUndefUndef() {
+        if (
+          nodeOpenPossibilities &&
+          arrayIncludesArray(nodeOpenPossibilities, [true, false])
+        ) {
+          let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+            true,
+            false,
+          ]);
+          nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+          nodeOpenPossibilities.push([false, true]);
+          model[nodeString].snapshot = merge({}, model);
+          model[firstComponentString] = { truthValue: true };
+          model[secondComponentString] = { truthValue: false };
+        } else if (
+          nodeOpenPossibilities &&
+          arrayIncludesArray(nodeOpenPossibilities, [false, true])
+        ) {
+          let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+            false,
+            true,
+          ]);
+          nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+          model[nodeString].snapshot = merge({}, model);
+          model[firstComponentString] = { truthValue: false };
+          model[secondComponentString] = { truthValue: true };
+        } else {
+          handleInconsistency();
+        }
       }
     }
   }
