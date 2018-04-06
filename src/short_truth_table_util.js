@@ -42,6 +42,10 @@ Logic.prototype.findIdx = function(str) {
 };
 
 Logic.prototype.supposeTrue = function() {
+  if (this.value === 'f') {
+    return;
+  }
+
   const wff = this;
 
   const length = wff.length();
@@ -191,20 +195,6 @@ Logic.prototype.supposeTrue = function() {
       ) {
         addTrueFalse();
         handleUndefUndef();
-      }
-    }
-
-    function addFalseTrue() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[false, true]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
-      }
-    }
-
-    function addTrueFalse() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[true, false]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
       }
     }
 
@@ -373,13 +363,6 @@ Logic.prototype.supposeTrue = function() {
       } else {
         model[firstComponentString] = { truthValue: false };
         model[secondComponentString] = { truthValue: false };
-      }
-    }
-
-    function addTrueTrue() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[true, true]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
       }
     }
 
@@ -892,20 +875,6 @@ Logic.prototype.supposeTrue = function() {
       }
     }
 
-    function addTrueTrue() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[true, true]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
-      }
-    }
-
-    function addFalseTrue() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[false, true]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
-      }
-    }
-
     function handleFalseUndef() {
       if (
         nodeOpenPossibilities &&
@@ -1034,6 +1003,27 @@ Logic.prototype.supposeTrue = function() {
       i = closest.idx - 1;
       const closestString = closest.node.stringify();
       model = model[closestString].snapshot;
+    }
+  }
+
+  function addTrueTrue() {
+    if (!nodeOpenPossibilities) {
+      model[nodeString].openPossibilities = [[true, true]];
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
+    }
+  }
+
+  function addTrueFalse() {
+    if (!nodeOpenPossibilities) {
+      model[nodeString].openPossibilities = [[true, false]];
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
+    }
+  }
+
+  function addFalseTrue() {
+    if (!nodeOpenPossibilities) {
+      model[nodeString].openPossibilities = [[false, true]];
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
     }
   }
 };

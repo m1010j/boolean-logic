@@ -1,6 +1,7 @@
 jest.unmock('../boolean-logic.js');
-jest.unmock('../src/logic.js');
+jest.unmock('../src/class_definition.js');
 jest.unmock('../src/class_util.js');
+jest.unmock('../src/short_truth_table_util.js');
 
 import Logic, { isTrue, isSat, normalize, reduce } from '../boolean-logic.js';
 
@@ -116,44 +117,58 @@ describe('isTrue', () => {
 describe('isSat', () => {
   describe('when given a string', () => {
     describe('when not asked to return model', () => {
-      it("evauates 't' to satisfiable", () => {
-        expect(isSat('t')).toBe(true);
+      describe('when not asked to use brute force', () => {
+        it("evauates 't' to satisfiable", () => {
+          expect(isSat('t')).toBe(true);
+        });
+        it("evauates 'f' to unsatisfiable", () => {
+          expect(isSat('f')).toBe(false);
+        });
+        it("evauates '1' to satisfiable", () => {
+          expect(isSat('1')).toBe(true);
+        });
+        it("evauates '12' to satisfiable", () => {
+          expect(isSat('12')).toBe(true);
+        });
+        it("evauates '1ON1' to unsatisfiable", () => {
+          expect(isSat('1AN1')).toBe(false);
+        });
+        it('also takes arrays of strings as arguments', () => {
+          expect(isSat(['N', 'N', 't'])).toBe(true);
+        });
+        it("returns undefined for arguments that aren't well-formed", () => {
+          expect(isSat('At')).toBe(undefined);
+        });
+        it('throws error for arguments that contain unknown vocabulary', () => {
+          function error() {
+            isSat('tCt');
+          }
+          expect(error).toThrow(
+            "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+          );
+        });
       });
-      it("evauates 'f' to unsatisfiable", () => {
-        expect(isSat('f')).toBe(false);
-      });
-      it("evauates '1' to satisfiable", () => {
-        expect(isSat('1')).toBe(true);
-      });
-      it("evauates '12' to satisfiable", () => {
-        expect(isSat('12')).toBe(true);
-      });
-      it("evauates '1ON1' to unsatisfiable", () => {
-        expect(isSat('1AN1')).toBe(false);
-      });
-      it('also takes arrays of strings as arguments', () => {
-        expect(isSat(['N', 'N', 't'])).toBe(true);
-      });
-      it("returns undefined for arguments that aren't well-formed", () => {
-        expect(isSat('At')).toBe(undefined);
-      });
-      it('throws error for arguments that contain unknown vocabulary', () => {
-        function error() {
-          isSat('tCt');
-        }
-        expect(error).toThrow(
-          "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
-        );
+      describe('when asked to use brute force', () => {
+        it('behaves the same way', () => {
+          expect(isSat('t', false, true)).toBe(true);
+          expect(isSat('f', false, true)).toBe(false);
+          expect(isSat('1', false, true)).toBe(true);
+          expect(isSat('12', false, true)).toBe(true);
+          expect(isSat('1AN1', false, true)).toBe(false);
+          expect(isSat(['N', 'N', 't'], false, true)).toBe(true);
+          expect(isSat('At', false, true)).toBe(undefined);
+          function error() {
+            isSat('tCt', false, true);
+          }
+          expect(error).toThrow(
+            "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+          );
+        });
       });
     });
     describe('when asked to return model', () => {
       it('returns model in which the argument is true', () => {
-        expect(isSat('(1A2A3)X4', true)).toEqual({
-          1: false,
-          2: true,
-          3: true,
-          4: true,
-        });
+        expect(isTrue('(1A2A3)X4', isSat('(1A2A3)X4', true))).toEqual(true);
       });
     });
   });
@@ -177,13 +192,11 @@ describe('isSat', () => {
     describe('when asked to return model', () => {
       it('returns model in which the argument is true', () => {
         expect(
-          isSat(['(', '1', 'A', '2', 'A', '3', ')', 'X', '4'], true)
-        ).toEqual({
-          1: false,
-          2: true,
-          3: true,
-          4: true,
-        });
+          isTrue(
+            ['(', '1', 'A', '2', 'A', '3', ')', 'X', '4'],
+            isSat(['(', '1', 'A', '2', 'A', '3', ')', 'X', '4'], true)
+          )
+        ).toEqual(true);
       });
     });
   });
