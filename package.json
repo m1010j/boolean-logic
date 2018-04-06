@@ -1,7 +1,8 @@
 {
   "name": "boolean-logic",
-  "version": "1.0.16",
-  "description": "A lightweight package for evaluating formulas of Boolean logic",
+  "version": "1.0.17",
+  "description":
+    "A lightweight package for evaluating formulas of Boolean logic",
   "main": "boolean-logic.js",
   "dependencies": {
     "lodash": "^4.17.5"
@@ -23,11 +24,7 @@
     "automock": true
   },
   "repository": "git+https://github.com/m1010j/boolean-logic.git",
-  "keywords": [
-    "logic",
-    "boolean",
-    "satisfiability"
-  ],
+  "keywords": ["logic", "boolean", "satisfiability"],
   "author": "Matthias Jenny",
   "email": "matthiascjenny@gmail.com",
   "url": "http://www.matthiasjenny.com",

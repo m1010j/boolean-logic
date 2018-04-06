@@ -42,7 +42,10 @@ Logic.prototype.findIdx = function(str) {
 };
 
 Logic.prototype.supposeTrue = function() {
-  // Seems to get this wrong: (N(((((23T31)X(4T26))B12)T(((10A21)X((11B4)T(28T29)))X((30O(29T2))T19)))T((28O30)X((14B6)O((3A((5A(14X24))A29))T(N(18T((7O23)X((14A(21O24))O3)))))))))
+  if (this.value === 'f') {
+    return;
+  }
+
   const wff = this;
 
   const length = wff.length();
@@ -92,11 +95,36 @@ Logic.prototype.supposeTrue = function() {
 
   function extractRealModel() {
     const realModel = {};
-    for (let key in model) {
-      if (key !== 't' && key !== 'f' && Logic._isAtomic(key)) {
-        realModel[key] = model[key].truthValue;
+    const wffString = wff.stringify();
+    const containsT = wffString.includes('t');
+    const containsF = wffString.includes('f');
+
+    if (containsT && containsF) {
+      for (let key in model) {
+        if (Logic._isAtomic(key)) {
+          realModel[key] = model[key].truthValue;
+        }
+      }
+    } else if (containsT && !containsF) {
+      for (let key in model) {
+        if (key !== 'f' && Logic._isAtomic(key)) {
+          realModel[key] = model[key].truthValue;
+        }
+      }
+    } else if (!containsT && containsF) {
+      for (let key in model) {
+        if (key !== 't' && Logic._isAtomic(key)) {
+          realModel[key] = model[key].truthValue;
+        }
+      }
+    } else if (!containsT && !containsF) {
+      for (let key in model) {
+        if (key !== 't' && key !== 'f' && Logic._isAtomic(key)) {
+          realModel[key] = model[key].truthValue;
+        }
       }
     }
+
     return realModel;
   }
 
@@ -192,20 +220,6 @@ Logic.prototype.supposeTrue = function() {
       ) {
         addTrueFalse();
         handleUndefUndef();
-      }
-    }
-
-    function addFalseTrue() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[false, true]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
-      }
-    }
-
-    function addTrueFalse() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[true, false]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
       }
     }
 
@@ -374,13 +388,6 @@ Logic.prototype.supposeTrue = function() {
       } else {
         model[firstComponentString] = { truthValue: false };
         model[secondComponentString] = { truthValue: false };
-      }
-    }
-
-    function addTrueTrue() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[true, true]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
       }
     }
 
@@ -893,20 +900,6 @@ Logic.prototype.supposeTrue = function() {
       }
     }
 
-    function addTrueTrue() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[true, true]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
-      }
-    }
-
-    function addFalseTrue() {
-      if (!nodeOpenPossibilities) {
-        model[nodeString].openPossibilities = [[false, true]];
-        nodeOpenPossibilities = model[nodeString].openPossibilities;
-      }
-    }
-
     function handleFalseUndef() {
       if (
         nodeOpenPossibilities &&
@@ -1035,6 +1028,27 @@ Logic.prototype.supposeTrue = function() {
       i = closest.idx - 1;
       const closestString = closest.node.stringify();
       model = model[closestString].snapshot;
+    }
+  }
+
+  function addTrueTrue() {
+    if (!nodeOpenPossibilities) {
+      model[nodeString].openPossibilities = [[true, true]];
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
+    }
+  }
+
+  function addTrueFalse() {
+    if (!nodeOpenPossibilities) {
+      model[nodeString].openPossibilities = [[true, false]];
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
+    }
+  }
+
+  function addFalseTrue() {
+    if (!nodeOpenPossibilities) {
+      model[nodeString].openPossibilities = [[false, true]];
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
     }
   }
 };

@@ -30,6 +30,12 @@ Logic.isSat = function(wff, returnModel, bruteForce) {
   }
 };
 
+Logic.isValid = function(wff, returnModel, bruteForce) {
+  if (wff[0] !== '(') {
+    return this.isSat(wff, returnModel, bruteForce);
+  }
+};
+
 Logic.normalize = function(wff) {
   const parsed = Logic._parse(wff);
   if (!parsed) {
