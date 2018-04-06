@@ -1,3 +1,4 @@
+jest.unmock('lodash');
 jest.unmock('../boolean-logic.js');
 jest.unmock('../src/class_definition.js');
 jest.unmock('../src/class_util.js');
@@ -7,62 +8,62 @@ import Logic, { isTrue, isSat, normalize, reduce } from '../boolean-logic.js';
 
 describe('isTrue', () => {
   describe('when given a string', () => {
-    it("evauates 't' to true without a model", () => {
+    it("evaluates 't' to true without a model", () => {
       expect(isTrue('t')).toBe(true);
     });
-    it("evauates 't' to true with an arbitrary model", () => {
+    it("evaluates 't' to true with an arbitrary model", () => {
       expect(isTrue('t', { t: false })).toBe(true);
     });
-    it("evauates 'f' to false without a model", () => {
+    it("evaluates 'f' to false without a model", () => {
       expect(isTrue('f')).toBe(false);
     });
-    it("evauates 't' to false with an arbitrary model", () => {
+    it("evaluates 't' to false with an arbitrary model", () => {
       expect(isTrue('f', { t: true })).toBe(false);
     });
-    it("evauates '1' to undefined without a model", () => {
+    it("evaluates '1' to undefined without a model", () => {
       expect(isTrue('1')).toBe(undefined);
     });
-    it("evauates '1' to the value specified by the model", () => {
+    it("evaluates '1' to the value specified by the model", () => {
       expect(isTrue('1', { 1: true })).toBe(true);
     });
-    it("evauates '12' to undefined without a model", () => {
+    it("evaluates '12' to undefined without a model", () => {
       expect(isTrue('12')).toBe(undefined);
     });
-    it("evauates '12' to the value specified by the model", () => {
+    it("evaluates '12' to the value specified by the model", () => {
       expect(isTrue('12', { 12: false })).toBe(false);
     });
-    it("evauates '1' to undefined with a corrupt model", () => {
+    it("evaluates '1' to undefined with a corrupt model", () => {
       expect(isTrue('1', { 1: 'corrupt' })).toBe(undefined);
     });
-    it('correctly evauates negations', () => {
+    it('correctly evaluates negations', () => {
       expect(isTrue('(Nt)')).toBe(false);
       expect(isTrue('(Nf)')).toBe(true);
     });
-    it('correctly evauates conjunctions', () => {
+    it('correctly evaluates conjunctions', () => {
       expect(isTrue('(tAt)')).toBe(true);
       expect(isTrue('(tAf)')).toBe(false);
       expect(isTrue('(fAt)')).toBe(false);
       expect(isTrue('(fAf)')).toBe(false);
     });
-    it('correctly evauates inclusive disjunctions', () => {
+    it('correctly evaluates inclusive disjunctions', () => {
       expect(isTrue('(tOt)')).toBe(true);
       expect(isTrue('(tOf)')).toBe(true);
       expect(isTrue('(fOt)')).toBe(true);
       expect(isTrue('(fOf)')).toBe(false);
     });
-    it('correctly evauates exclusive disjunctions', () => {
+    it('correctly evaluates exclusive disjunctions', () => {
       expect(isTrue('(tXt)')).toBe(false);
       expect(isTrue('(tXf)')).toBe(true);
       expect(isTrue('(fXt)')).toBe(true);
       expect(isTrue('(fXf)')).toBe(false);
     });
-    it('correctly evauates conditionals', () => {
+    it('correctly evaluates conditionals', () => {
       expect(isTrue('(tTt)')).toBe(true);
       expect(isTrue('(tTf)')).toBe(false);
       expect(isTrue('(fTt)')).toBe(true);
       expect(isTrue('(fTf)')).toBe(true);
     });
-    it('correctly evauates biconditionals', () => {
+    it('correctly evaluates biconditionals', () => {
       expect(isTrue('(tBt)')).toBe(true);
       expect(isTrue('(tBf)')).toBe(false);
       expect(isTrue('(fBt)')).toBe(false);
@@ -118,19 +119,26 @@ describe('isSat', () => {
   describe('when given a string', () => {
     describe('when not asked to return model', () => {
       describe('when not asked to use brute force', () => {
-        it("evauates 't' to satisfiable", () => {
+        it("evaluates 't' to satisfiable", () => {
           expect(isSat('t')).toBe(true);
         });
-        it("evauates 'f' to unsatisfiable", () => {
+        it("evaluates 'f' to unsatisfiable", () => {
           expect(isSat('f')).toBe(false);
         });
-        it("evauates '1' to satisfiable", () => {
+        it("evaluates '1' to satisfiable", () => {
           expect(isSat('1')).toBe(true);
         });
-        it("evauates '12' to satisfiable", () => {
+        it("evaluates '12' to satisfiable", () => {
           expect(isSat('12')).toBe(true);
         });
-        it("evauates '1ON1' to unsatisfiable", () => {
+        it("evaluates '(((6O1)B4)A(N(N(N(((13O1)B(7T(((14B5)X(1B10))T3)))O((9X5)O7))))))' to satisfiable", () => {
+          expect(
+            isSat(
+              '(((6O1)B4)A(N(N(N(((13O1)B(7T(((14B5)X(1B10))T3)))O((9X5)O7))))))'
+            )
+          ).toBe(true);
+        });
+        it("evaluates '1ON1' to unsatisfiable", () => {
           expect(isSat('1AN1')).toBe(false);
         });
         it('also takes arrays of strings as arguments', () => {
@@ -154,6 +162,13 @@ describe('isSat', () => {
           expect(isSat('f', false, true)).toBe(false);
           expect(isSat('1', false, true)).toBe(true);
           expect(isSat('12', false, true)).toBe(true);
+          expect(
+            isSat(
+              '(((6O1)B4)A(N(N(N(((13O1)B(7T(((14B5)X(1B10))T3)))O((9X5)O7))))))',
+              false,
+              true
+            )
+          ).toBe(true);
           expect(isSat('1AN1', false, true)).toBe(false);
           expect(isSat(['N', 'N', 't'], false, true)).toBe(true);
           expect(isSat('At', false, true)).toBe(undefined);

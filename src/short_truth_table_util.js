@@ -95,11 +95,36 @@ Logic.prototype.supposeTrue = function() {
 
   function extractRealModel() {
     const realModel = {};
-    for (let key in model) {
-      if (key !== 't' && key !== 'f' && Logic._isAtomic(key)) {
-        realModel[key] = model[key].truthValue;
+    const wffString = wff.stringify();
+    const containsT = wffString.includes('t');
+    const containsF = wffString.includes('f');
+
+    if (containsT && containsF) {
+      for (let key in model) {
+        if (Logic._isAtomic(key)) {
+          realModel[key] = model[key].truthValue;
+        }
+      }
+    } else if (containsT && !containsF) {
+      for (let key in model) {
+        if (key !== 'f' && Logic._isAtomic(key)) {
+          realModel[key] = model[key].truthValue;
+        }
+      }
+    } else if (!containsT && containsF) {
+      for (let key in model) {
+        if (key !== 't' && Logic._isAtomic(key)) {
+          realModel[key] = model[key].truthValue;
+        }
+      }
+    } else if (!containsT && !containsF) {
+      for (let key in model) {
+        if (key !== 't' && key !== 'f' && Logic._isAtomic(key)) {
+          realModel[key] = model[key].truthValue;
+        }
       }
     }
+
     return realModel;
   }
 
