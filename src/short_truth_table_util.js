@@ -42,12 +42,11 @@ Logic.prototype.findIdx = function(str) {
 };
 
 Logic.prototype.supposeTrue = function() {
-  // const reduced = this.reduce();
-  const reduced = this;
+  const wff = this;
 
-  const length = reduced.length();
+  const length = wff.length();
   let model = {
-    [reduced.stringify()]: { truthValue: true },
+    [wff.stringify()]: { truthValue: true },
     t: { truthValue: true },
     f: { truthValue: false },
   };
@@ -64,18 +63,24 @@ Logic.prototype.supposeTrue = function() {
   let nodeOpenPossibilities;
 
   while (!model.busted && i < length) {
-    node = reduced.nthNode(i);
+    node = wff.nthNode(i);
     nodeString = node.stringify();
     if (model[nodeString] !== undefined) {
       nodeValueInModel = model[nodeString].truthValue;
     }
     if (typeof nodeValueInModel === 'boolean') {
       if (node.value === 'N') {
-        handleNegation();
+        handleNot();
+      } else if (node.value === 'A') {
+        handleAnd();
       } else if (node.value === 'O') {
-        handleDisjunction();
+        handleOr();
       } else if (node.value === 'X') {
         handleXor();
+      } else if (node.value === 'T') {
+        handleIf();
+      } else if (node.value === 'B') {
+        handleIff();
       }
     }
     i++;
@@ -94,7 +99,7 @@ Logic.prototype.supposeTrue = function() {
     return realModel;
   }
 
-  function handleNegation() {
+  function handleNot() {
     negatumValueInModel = undefined;
     negatumString = node.children[0].stringify();
     if (model[negatumString] !== undefined) {
@@ -107,7 +112,206 @@ Logic.prototype.supposeTrue = function() {
     }
   }
 
-  function handleDisjunction() {
+  function handleAnd() {
+    firstComponentString = node.children[0].stringify();
+    secondComponentString = node.children[1].stringify();
+    firstComponentValueInModel = undefined;
+    secondComponentValueInModel = undefined;
+    if (model[firstComponentString] !== undefined) {
+      firstComponentValueInModel = model[firstComponentString].truthValue;
+    }
+    if (model[secondComponentString] !== undefined) {
+      secondComponentValueInModel = model[secondComponentString].truthValue;
+    }
+    if (model[nodeString] !== undefined) {
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
+    }
+    if (nodeValueInModel) {
+      handleNodeTrue();
+    } else {
+      handleNodeFalse();
+    }
+
+    function handleNodeTrue() {
+      if (
+        firstComponentValueInModel === false ||
+        secondComponentValueInModel === false
+      ) {
+        handleInconsistency();
+      } else if (
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === true
+      ) {
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[firstComponentString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: true };
+      }
+    }
+
+    function handleNodeFalse() {
+      if (
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === true
+      ) {
+        handleInconsistency();
+      } else if (
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === true
+      ) {
+        model[firstComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === undefined
+      ) {
+        addFalseTrue();
+        handleFalseUndef();
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === false
+      ) {
+        addTrueFalse();
+        handleUndefFalse();
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === undefined
+      ) {
+        addTrueFalse();
+        handleUndefUndef();
+      }
+    }
+
+    function addFalseTrue() {
+      if (!nodeOpenPossibilities) {
+        model[nodeString].openPossibilities = [[false, true]];
+        nodeOpenPossibilities = model[nodeString].openPossibilities;
+      }
+    }
+
+    function addTrueFalse() {
+      if (!nodeOpenPossibilities) {
+        model[nodeString].openPossibilities = [[true, false]];
+        nodeOpenPossibilities = model[nodeString].openPossibilities;
+      }
+    }
+
+    function handleFalseUndef() {
+      if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, true])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          true,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        nodeOpenPossibilities.push([false, false]);
+        model[nodeString].snapshot = merge({}, model);
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, false])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          false,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        model[nodeString].snapshot = merge({}, model);
+        model[secondComponentString] = { truthValue: false };
+      } else {
+        handleInconsistency();
+      }
+    }
+
+    function handleUndefFalse() {
+      if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [true, false])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          true,
+          false,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        nodeOpenPossibilities.push([false, false]);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, false])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          false,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: false };
+      } else {
+        handleInconsistency();
+      }
+    }
+
+    function handleUndefUndef() {
+      if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [true, false])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          true,
+          false,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        nodeOpenPossibilities.push([false, true]);
+        nodeOpenPossibilities.push([false, false]);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: false };
+      } else if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, true])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          true,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: false };
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, false])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          false,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: false };
+        model[secondComponentString] = { truthValue: false };
+      } else {
+        handleInconsistency();
+      }
+    }
+  }
+
+  function handleOr() {
     firstComponentString = node.children[0].stringify();
     secondComponentString = node.children[1].stringify();
     firstComponentValueInModel = undefined;
@@ -452,11 +656,363 @@ Logic.prototype.supposeTrue = function() {
       }
     }
   }
+  function handleIff() {
+    firstComponentString = node.children[0].stringify();
+    secondComponentString = node.children[1].stringify();
+    firstComponentValueInModel = undefined;
+    secondComponentValueInModel = undefined;
+    if (model[firstComponentString] !== undefined) {
+      firstComponentValueInModel = model[firstComponentString].truthValue;
+    }
+    if (model[secondComponentString] !== undefined) {
+      secondComponentValueInModel = model[secondComponentString].truthValue;
+    }
+    if (model[nodeString] !== undefined) {
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
+    }
+    if (!nodeValueInModel) {
+      handleNodeFalse();
+    } else {
+      handleNodeTrue();
+    }
+
+    function handleNodeFalse() {
+      if (
+        (firstComponentValueInModel === true &&
+          secondComponentValueInModel === true) ||
+        (firstComponentValueInModel === false &&
+          secondComponentValueInModel === false)
+      ) {
+        handleInconsistency();
+      } else if (
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === true
+      ) {
+        model[firstComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === false
+      ) {
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === undefined
+      ) {
+        addTrueFalse();
+        handleUndefUndef();
+      }
+
+      function addTrueFalse() {
+        if (!nodeOpenPossibilities) {
+          model[nodeString].openPossibilities = [[true, false]];
+          nodeOpenPossibilities = model[nodeString].openPossibilities;
+        }
+      }
+
+      function handleUndefUndef() {
+        if (
+          nodeOpenPossibilities &&
+          arrayIncludesArray(nodeOpenPossibilities, [true, false])
+        ) {
+          let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+            true,
+            false,
+          ]);
+          nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+          nodeOpenPossibilities.push([false, true]);
+          model[nodeString].snapshot = merge({}, model);
+          model[firstComponentString] = { truthValue: true };
+          model[secondComponentString] = { truthValue: false };
+        } else if (
+          nodeOpenPossibilities &&
+          arrayIncludesArray(nodeOpenPossibilities, [false, true])
+        ) {
+          let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+            false,
+            true,
+          ]);
+          nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+          model[nodeString].snapshot = merge({}, model);
+          model[firstComponentString] = { truthValue: false };
+          model[secondComponentString] = { truthValue: true };
+        } else {
+          handleInconsistency();
+        }
+      }
+    }
+
+    function handleNodeTrue() {
+      if (
+        (firstComponentValueInModel === true &&
+          secondComponentValueInModel === false) ||
+        (firstComponentValueInModel === false &&
+          secondComponentValueInModel === true)
+      ) {
+        handleInconsistency();
+      } else if (
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === true
+      ) {
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[secondComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === false
+      ) {
+        model[firstComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === undefined
+      ) {
+        addTrueTrue();
+        handleUndefUndef();
+      }
+
+      function addTrueTrue() {
+        if (!nodeOpenPossibilities) {
+          model[nodeString].openPossibilities = [[true, true]];
+          nodeOpenPossibilities = model[nodeString].openPossibilities;
+        }
+      }
+
+      function handleUndefUndef() {
+        if (
+          nodeOpenPossibilities &&
+          arrayIncludesArray(nodeOpenPossibilities, [true, true])
+        ) {
+          let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+            true,
+            true,
+          ]);
+          nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+          nodeOpenPossibilities.push([false, false]);
+          model[nodeString].snapshot = merge({}, model);
+          model[firstComponentString] = { truthValue: true };
+          model[secondComponentString] = { truthValue: true };
+        } else if (
+          nodeOpenPossibilities &&
+          arrayIncludesArray(nodeOpenPossibilities, [false, false])
+        ) {
+          let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+            false,
+            false,
+          ]);
+          nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+          model[nodeString].snapshot = merge({}, model);
+          model[firstComponentString] = { truthValue: false };
+          model[secondComponentString] = { truthValue: false };
+        } else {
+          handleInconsistency();
+        }
+      }
+    }
+  }
+
+  function handleIf() {
+    firstComponentString = node.children[0].stringify();
+    secondComponentString = node.children[1].stringify();
+    firstComponentValueInModel = undefined;
+    secondComponentValueInModel = undefined;
+    if (model[firstComponentString] !== undefined) {
+      firstComponentValueInModel = model[firstComponentString].truthValue;
+    }
+    if (model[secondComponentString] !== undefined) {
+      secondComponentValueInModel = model[secondComponentString].truthValue;
+    }
+    if (model[nodeString] !== undefined) {
+      nodeOpenPossibilities = model[nodeString].openPossibilities;
+    }
+    if (!nodeValueInModel) {
+      handleNodeFalse();
+    } else {
+      if (
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === false
+      ) {
+        handleInconsistency();
+      } else if (
+        firstComponentValueInModel === false &&
+        secondComponentValueInModel === undefined
+      ) {
+        addFalseTrue();
+        handleFalseUndef();
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === false
+      ) {
+        model[firstComponentString] = { truthValue: false };
+      } else if (
+        firstComponentValueInModel === true &&
+        secondComponentValueInModel === undefined
+      ) {
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === true
+      ) {
+        addTrueTrue();
+        handleUndefTrue();
+      } else if (
+        firstComponentValueInModel === undefined &&
+        secondComponentValueInModel === undefined
+      ) {
+        addTrueTrue();
+        handleUndefUndef();
+      }
+    }
+
+    function handleNodeFalse() {
+      if (
+        firstComponentValueInModel === false ||
+        secondComponentValueInModel === true
+      ) {
+        handleInconsistency();
+      } else {
+        model[firstComponentString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: false };
+      }
+    }
+
+    function addTrueTrue() {
+      if (!nodeOpenPossibilities) {
+        model[nodeString].openPossibilities = [[true, true]];
+        nodeOpenPossibilities = model[nodeString].openPossibilities;
+      }
+    }
+
+    function addFalseTrue() {
+      if (!nodeOpenPossibilities) {
+        model[nodeString].openPossibilities = [[false, true]];
+        nodeOpenPossibilities = model[nodeString].openPossibilities;
+      }
+    }
+
+    function handleFalseUndef() {
+      if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, true])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          true,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        nodeOpenPossibilities.push([false, false]);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, false])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          false,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: false };
+      } else {
+        handleInconsistency();
+      }
+    }
+
+    function handleUndefTrue() {
+      if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [true, true])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          true,
+          true,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        nodeOpenPossibilities.push([false, true]);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: true };
+      } else if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, true])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          true,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: false };
+      } else {
+        handleInconsistency();
+      }
+    }
+
+    function handleUndefUndef() {
+      if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [true, true])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          true,
+          true,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        nodeOpenPossibilities.push([false, true]);
+        nodeOpenPossibilities.push([false, false]);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, true])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          true,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: false };
+        model[secondComponentString] = { truthValue: true };
+      } else if (
+        nodeOpenPossibilities &&
+        arrayIncludesArray(nodeOpenPossibilities, [false, false])
+      ) {
+        let currentPossibilityIdx = indexOfArray(nodeOpenPossibilities, [
+          false,
+          false,
+        ]);
+        nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
+        model[nodeString].snapshot = merge({}, model);
+        model[firstComponentString] = { truthValue: false };
+        model[secondComponentString] = { truthValue: false };
+      } else {
+        handleInconsistency();
+      }
+    }
+  }
 
   function findClosestNodeAndIdxWithOpenPossibilities() {
     for (let j = i; j >= 0; j--) {
-      let current = reduced.nthNode(j);
-      if (current.value === 'O') {
+      let current = wff.nthNode(j);
+      if (['O', 'X', 'B', 'A', 'T'].includes(current.value)) {
         let currentString = current.stringify();
         let currentValueInModel = model[currentString];
         if (
