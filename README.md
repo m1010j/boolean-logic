@@ -50,12 +50,12 @@ isTrue(wff[, model]);
 #### `isSat()`
 
 ```javascript
-isSat(wff[, returnModel, bruteForce]);
+isSat(wffs[, returnModel, bruteForce]);
 ```
 
 ##### Parameters
 
-`wff`: The wff to be evaluated.
+`wffs`: A wff string or array of wff strings to be evaluated.
 
 `returnModel` (optional): A Boolean indicating whether function should return a model or `true` if `wff` is satisfiable. If this parameter isn't supplied, no model will be returned.
 
@@ -80,7 +80,8 @@ isTrue(['(', '1', 'A', '2', ')'], { 1: true, 2: false }); // false
 isSat('t'); // true
 isSat('f'); // false
 isSat('1'); // true
-isSat(['(', '1', 'A', 'N', '1', ')']); // false
+isSat('(1AN1)'); // false
+isSat(['1', 'N1']); // false
 isSat('(1O2)', true); // { 1: true, 2: true }
 isSat('(1O2)', true, true); // { 1: true, 2: true }
 

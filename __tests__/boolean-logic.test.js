@@ -4,7 +4,14 @@ jest.unmock('../src/class_definition.js');
 jest.unmock('../src/class_util.js');
 jest.unmock('../src/short_truth_table_util.js');
 
-import Logic, { isTrue, isSat, normalize, reduce } from '../boolean-logic.js';
+import Logic, {
+  isTrue,
+  isSat,
+  isValid,
+  counterModel,
+  normalize,
+  reduce,
+} from '../boolean-logic.js';
 
 describe('isTrue', () => {
   describe('when given a string', () => {
@@ -141,9 +148,6 @@ describe('isSat', () => {
         it("evaluates '1ON1' to unsatisfiable", () => {
           expect(isSat('1AN1')).toBe(false);
         });
-        it('also takes arrays of strings as arguments', () => {
-          expect(isSat(['N', 'N', 't'])).toBe(true);
-        });
         it("returns undefined for arguments that aren't well-formed", () => {
           expect(isSat('At')).toBe(undefined);
         });
@@ -170,7 +174,6 @@ describe('isSat', () => {
             )
           ).toBe(true);
           expect(isSat('1AN1', false, true)).toBe(false);
-          expect(isSat(['N', 'N', 't'], false, true)).toBe(true);
           expect(isSat('At', false, true)).toBe(undefined);
           function error() {
             isSat('tCt', false, true);
@@ -187,39 +190,44 @@ describe('isSat', () => {
       });
     });
   });
-  describe('when given an array', () => {
+  describe('when given an array of strings', () => {
     describe('when not asked to return model', () => {
-      it('correctly evaluates argument', () => {
-        expect(isSat(['N', 'N', 't'])).toBe(true);
+      it('correctly evaluates conjunction of strings', () => {
+        expect(isSat(['1', '2'])).toBe(true);
       });
-      it("returns undefined for arguments that aren't well-formed", () => {
-        expect(isSat(['A', 't'])).toBe(undefined);
-      });
-      it('throws error for arguments that contain unknown vocabulary', () => {
-        function error() {
-          isSat(['t', 'C', 't']);
-        }
-        expect(error).toThrow(
-          "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
-        );
+      describe('when asked to return model', () => {
+        it('returns model in which the conjunction of strings is true', () => {
+          expect(isTrue('1A2', isSat(['1', '2'], true))).toEqual(true);
+        });
       });
     });
-    describe('when asked to return model', () => {
-      it('returns model in which the argument is true', () => {
-        expect(
-          isTrue(
-            ['(', '1', 'A', '2', 'A', '3', ')', 'X', '4'],
-            isSat(['(', '1', 'A', '2', 'A', '3', ')', 'X', '4'], true)
-          )
-        ).toEqual(true);
-      });
+    it("throws error for arguments that aren't strings or arrays", () => {
+      function error() {
+        isSat({});
+      }
+      expect(error).toThrow('Argument must be either a string or an array');
     });
   });
-  it("throws error for arguments that aren't strings or arrays", () => {
-    function error() {
-      isSat({});
-    }
-    expect(error).toThrow('Argument must be either a string or an array');
+});
+
+describe('isValid', () => {
+  describe('when not asked to use brute force', () => {
+    describe('when given a single wff string', () => {
+      it('correctly evaluates logical truths', () => {
+        expect(isValid('1ON1')).toEqual(true);
+      });
+      it("correctly evaluates wffs that aren't logical truths", () => {
+        expect(isValid('1ON2')).toEqual(false);
+      });
+    });
+    describe('when given two wff strings', () => {
+      it('correctly evaluates valid arguments', () => {
+        expect(isValid(['1', '1'])).toEqual(true);
+      });
+      it('correctly evaluates invalid arguments', () => {
+        expect(isValid(['1', '2'])).toEqual(false);
+      });
+    });
   });
 });
 
@@ -322,6 +330,12 @@ describe('Logic', () => {
   });
   it("has an 'isSat' property", () => {
     expect(Logic.isSat).toBeTruthy();
+  });
+  it("has an 'isValid' property", () => {
+    expect(Logic.isValid).toBeTruthy();
+  });
+  it("has an 'counterModel' property", () => {
+    expect(Logic.counterModel).toBeTruthy();
   });
   it("has a 'normalize' property", () => {
     expect(Logic.normalize).toBeTruthy();

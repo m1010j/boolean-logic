@@ -8,13 +8,17 @@ Logic.isTrue = function(wff, model) {
   return parsed.isTrue(model);
 };
 
-Logic.isSat = function(wff, returnModel, bruteForce) {
-  const parsedWff = Logic._parse(wff);
+Logic.isSat = function(wffs, returnModel, bruteForce) {
+  if (wffs instanceof Array) {
+    wffs = wffs.join('A');
+  }
+
+  const parsedWff = Logic._parse(wffs);
   if (!parsedWff) {
     return;
   }
   if (bruteForce) {
-    const models = this._generateModels(wff);
+    const models = this._generateModels(wffs);
     return this._checkModels(parsedWff, models, returnModel);
   } else {
     const model = parsedWff.supposeTrue();
@@ -30,10 +34,14 @@ Logic.isSat = function(wff, returnModel, bruteForce) {
   }
 };
 
-Logic.isValid = function(wff, returnModel, bruteForce) {
-  if (wff[0] !== '(') {
-    return this.isSat(wff, returnModel, bruteForce);
-  }
+Logic.isValid = function(argument, bruteForce) {
+  argument = this._validateArgument(argument);
+  return !this.isSat(`N${argument}`, false, bruteForce);
+};
+
+Logic.counterModel = function(argument, bruteForce) {
+  argument = this._validateArgument(argument);
+  return this.isSat(`N${argument}`, true, bruteForce);
 };
 
 Logic.normalize = function(wff) {
@@ -65,6 +73,10 @@ Logic.reduce = function(wff) {
 export const isTrue = Logic.isTrue.bind(Logic);
 
 export const isSat = Logic.isSat.bind(Logic);
+
+export const isValid = Logic.isValid.bind(Logic);
+
+export const counterModel = Logic.counterModel.bind(Logic);
 
 export const normalize = Logic.normalize.bind(Logic);
 

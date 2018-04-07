@@ -328,4 +328,39 @@ Logic._arraysAreEqual = function(first, second) {
   return true;
 };
 
+Logic._validateArgument = function(argument) {
+  if (typeof argument === 'string') {
+    return this.normalize(argument);
+  } else if (argument instanceof Array && argument.length === 2) {
+    let premises = argument[0];
+    if (premises instanceof Array) {
+      premises = this._normalizeArray(premises);
+      if (premises.length === 0) {
+        premises = 't';
+      } else {
+        premises = premises.join('A');
+      }
+    }
+
+    let conclusions = argument[1];
+    if (conclusions instanceof Array) {
+      conclusions = this._normalizeArray(conclusions);
+      if (conclusions.length === 0) {
+        conclusions = 'f';
+      } else {
+        conclusions = conclusions.join('O');
+      }
+    }
+    return `(${this.normalize(premises)}T${this.normalize(conclusions)})`;
+  } else {
+    throw 'Argument must be either a string, an array of two strings, or an array of two (possibly empty) arrays of strings.';
+  }
+};
+
+Logic._normalizeArray = function(array) {
+  return array.map(wff => {
+    return this.normalize(wff);
+  });
+};
+
 export default Logic;
