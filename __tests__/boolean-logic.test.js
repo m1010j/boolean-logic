@@ -241,7 +241,7 @@ describe('isValid', () => {
         expect(isValid(['2', ['1', '2']])).toEqual(true);
       });
       it('returns a countermodel for invalid arguments', () => {
-        expect(isValid(['0', ['1', '2']])).toEqual(false);
+        expect(isValid(['3', ['1', '2']])).toEqual(false);
       });
     });
     describe('when given two arrays of wff strings', () => {

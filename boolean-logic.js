@@ -36,11 +36,13 @@ Logic.isSat = function(wffs, returnModel, bruteForce) {
 
 Logic.isValid = function(argument, bruteForce) {
   argument = this._validateArgument(argument);
+  if (!argument) return;
   return !this.isSat(`N${argument}`, false, bruteForce);
 };
 
 Logic.counterModel = function(argument, bruteForce) {
   argument = this._validateArgument(argument);
+  if (!argument) return;
   return this.isSat(`N${argument}`, true, bruteForce);
 };
 
