@@ -1,9 +1,9 @@
 import Logic from './short_truth_table_util';
 
 Logic._checkModels = function(parsedWff, models, returnModel) {
-  for (let i = 0; i < models.length; i++) {
-    if (parsedWff.isTrue(models[i])) {
-      return returnModel ? models[i] : true;
+  for (let model of models) {
+    if (parsedWff.isTrue(model)) {
+      return returnModel ? model : true;
     }
   }
   return false;
@@ -61,9 +61,10 @@ Logic._parse = function(wff) {
   this._ensureIsLegal(wff);
   wff = Logic._ensureIsArray(wff);
   if (!wff) {
-    throw 'Argument must be either a string or an array';
+    throw new Error('Argument must be either a string or an array');
   }
   const mainConnectiveIdx = this._mainConnectiveIdx(wff);
+
   const mainConnective = wff[mainConnectiveIdx];
   if (wff.length === 1 && Logic._isAtomic(wff[0])) {
     return new Logic(wff[0]);
@@ -287,7 +288,9 @@ Logic._ensureIsArray = function(wff) {
 Logic._ensureIsLegal = function(wff) {
   for (let i = 0; i < wff.length; i++) {
     if (!this._vocabulary.includes(wff[i]) && !this._isAtomic(wff[i])) {
-      throw "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)";
+      throw new Error(
+        "Argument can only contain 'N', 'A', 'O', 'T', 'B', 'X', '(', ')', 't', 'f', and numerals (strings of integers)"
+      );
     }
   }
 };
@@ -353,7 +356,9 @@ Logic._validateArgument = function(argument) {
     }
     return `(${this.normalize(premises)}T${this.normalize(conclusions)})`;
   } else {
-    throw 'Argument must be either a string, an array of two strings, or an array of two (possibly empty) arrays of strings.';
+    throw new Error(
+      'Argument must be either a string, an array of two strings, or an array of two (possibly empty) arrays of strings.'
+    );
   }
 };
 

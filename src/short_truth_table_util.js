@@ -912,7 +912,7 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         nodeOpenPossibilities.push([false, false]);
         model[nodeString].snapshot = merge({}, model);
-        model[firstComponentString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: true };
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [false, false])
@@ -923,7 +923,7 @@ Logic.prototype.supposeTrue = function() {
         ]);
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
-        model[firstComponentString] = { truthValue: false };
+        model[secondComponentString] = { truthValue: false };
       } else {
         handleInconsistency();
       }

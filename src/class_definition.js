@@ -162,8 +162,8 @@ Logic.prototype.stringify = function() {
 
 Logic.prototype.isTrue = function(model = {}) {
   const modelValues = Object.keys(model).map(key => model[key]);
-  for (let i = 0; i < modelValues.length; i++) {
-    if (modelValues[i] !== true && modelValues[i] !== false) {
+  for (let modelValue of modelValues) {
+    if (modelValue !== true && modelValue !== false) {
       return;
     }
   }
