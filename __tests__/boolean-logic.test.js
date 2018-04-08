@@ -138,7 +138,7 @@ describe('isSat', () => {
         it("evaluates '12' to satisfiable", () => {
           expect(isSat('12')).toBe(true);
         });
-        it("evaluates '(((6O1)B4)A(N(N(N(((13O1)B(7T(((14B5)X(1B10))T3)))O((9X5)O7))))))' to satisfiable", () => {
+        it('evaluates a more complex wff as to satisfiable', () => {
           expect(
             isSat(
               '(((6O1)B4)A(N(N(N(((13O1)B(7T(((14B5)X(1B10))T3)))O((9X5)O7))))))'
@@ -221,13 +221,144 @@ describe('isValid', () => {
       });
     });
     describe('when given two wff strings', () => {
-      it('correctly evaluates valid arguments', () => {
+      it('returns false valid arguments', () => {
         expect(isValid(['1', '1'])).toEqual(true);
       });
-      it('correctly evaluates invalid arguments', () => {
+      it('returns a countermodel for invalid arguments', () => {
         expect(isValid(['1', '2'])).toEqual(false);
       });
     });
+    describe('when given an array of wff strings and a wff string', () => {
+      it('returns false valid arguments', () => {
+        expect(isValid([['1', '1T2'], '2'])).toEqual(true);
+      });
+      it('returns a countermodel for invalid arguments', () => {
+        expect(isValid([['1', '1T2'], '3'])).toEqual(false);
+      });
+    });
+    describe('when given a wff string and an array of wff strings', () => {
+      it('returns false valid arguments', () => {
+        expect(isValid(['2', ['1', '2']])).toEqual(true);
+      });
+      it('returns a countermodel for invalid arguments', () => {
+        expect(isValid(['0', ['1', '2']])).toEqual(false);
+      });
+    });
+    describe('when given two arrays of wff strings', () => {
+      it('returns false valid arguments', () => {
+        expect(isValid([['1', '3'], ['1', '2']])).toEqual(true);
+      });
+      it('returns a countermodel for invalid arguments', () => {
+        expect(isValid([['3', '4'], ['1', '2']])).toEqual(false);
+      });
+    });
+    describe('when given an empty array as the first argument', () => {
+      it('treats the premise as verum', () => {
+        expect(isValid([[], ['1ON1']])).toEqual(true);
+        expect(isValid([[], '1ON1'])).toEqual(true);
+        expect(isValid([[], ['1ON2']])).toEqual(false);
+        expect(isValid([[], '1ON2'])).toEqual(false);
+      });
+    });
+    describe('when given an empty array as the second argument', () => {
+      it('treats the conclusion as falsum', () => {
+        expect(isValid([['1AN1'], []])).toEqual(true);
+        expect(isValid(['1AN1', []])).toEqual(true);
+        expect(isValid([['1AN2'], []])).toEqual(false);
+        expect(isValid(['1AN2', []])).toEqual(false);
+      });
+    });
+  });
+  describe('when asked to use brute force', () => {
+    it('behaves the same way', () => {
+      expect(isValid('1ON1', true)).toEqual(true);
+      expect(isValid('1ON2', true)).toEqual(false);
+      expect(isValid(['1', '1'], true)).toEqual(true);
+      expect(isValid(['1', '2'], true)).toEqual(false);
+      expect(isValid([['1', '1T2'], '2'], true)).toEqual(true);
+      expect(isValid([['1', '1T2'], '3'], true)).toEqual(false);
+      expect(isValid(['2', ['1', '2']], true)).toEqual(true);
+      expect(isValid(['0', ['1', '2']], true)).toEqual(false);
+      expect(isValid([['1', '3'], ['1', '2']], true)).toEqual(true);
+      expect(isValid([['3', '4'], ['1', '2']], true)).toEqual(false);
+      expect(isValid([[], ['1ON1']], true)).toEqual(true);
+      expect(isValid([[], '1ON1'], true)).toEqual(true);
+      expect(isValid([[], ['1ON2']], true)).toEqual(false);
+      expect(isValid([[], '1ON2'], true)).toEqual(false);
+      expect(isValid([['1AN1'], []], true)).toEqual(true);
+      expect(isValid(['1AN1', []], true)).toEqual(true);
+      expect(isValid([['1AN2'], []], true)).toEqual(false);
+      expect(isValid(['1AN2', []], true)).toEqual(false);
+    });
+  });
+});
+
+describe('counterModel', () => {
+  describe('when not asked to use brute force', () => {
+    describe('when given a single wff string', () => {
+      it('returns a countermodel for invalid arguments', () => {
+        expect(!isTrue('1ON2', counterModel('1ON2'))).toEqual(true);
+        expect(!isTrue('1T2', counterModel(['1', '2']))).toEqual(true);
+        expect(
+          !isTrue('(1A(1T2))T3', counterModel([['1', '1T2'], '3']))
+        ).toEqual(true);
+        expect(!isTrue('3T(1O2)', counterModel(['3', ['1', '2']]))).toEqual(
+          true
+        );
+        expect(
+          !isTrue('(3A4)T(1O2)', counterModel([['3', '4'], ['1', '2']]))
+        ).toEqual(true);
+        expect(!isTrue('tT(1ON2)', counterModel([[], ['1ON2']]))).toEqual(true);
+        expect(!isTrue('tT1ON2', counterModel([[], '1ON2']))).toEqual(true);
+        expect(!isTrue('(1AN2)Tf', counterModel([['1AN2'], []]))).toEqual(true);
+        expect(!isTrue('(1AN2)Tf', counterModel(['1AN2', []]))).toEqual(true);
+      });
+      it('returns false for valid arguments', () => {
+        expect(counterModel('1ON1')).toEqual(false);
+        expect(counterModel(['1', '1'])).toEqual(false);
+        expect(counterModel(['2', ['1', '2']])).toEqual(false);
+        expect(counterModel([['1', '3'], ['1', '2']])).toEqual(false);
+        expect(counterModel([['1AN1'], []])).toEqual(false);
+        expect(counterModel(['1AN1', []])).toEqual(false);
+        expect(counterModel([[], ['1ON1']])).toEqual(false);
+        expect(counterModel([[], '1ON1'])).toEqual(false);
+        expect(counterModel([['1', '1T2'], '2'])).toEqual(false);
+      });
+    });
+  });
+  describe('when asked to use brute force', () => {
+    it('behaves the same way', () => {
+      expect(!isTrue('1ON2', counterModel('1ON2', true))).toEqual(true);
+      expect(!isTrue('1T2', counterModel(['1', '2'], true))).toEqual(true);
+      expect(
+        !isTrue('(1A(1T2))T3', counterModel([['1', '1T2'], '3'], true))
+      ).toEqual(true);
+      expect(!isTrue('3T(1O2)', counterModel(['3', ['1', '2']], true))).toEqual(
+        true
+      );
+      expect(
+        !isTrue('(3A4)T(1O2)', counterModel([['3', '4'], ['1', '2']], true))
+      ).toEqual(true);
+      expect(!isTrue('tT(1ON2)', counterModel([[], ['1ON2']], true))).toEqual(
+        true
+      );
+      expect(!isTrue('tT1ON2', counterModel([[], '1ON2'], true))).toEqual(true);
+      expect(!isTrue('(1AN2)Tf', counterModel([['1AN2'], []], true))).toEqual(
+        true
+      );
+      expect(!isTrue('(1AN2)Tf', counterModel(['1AN2', []], true))).toEqual(
+        true
+      );
+    });
+    expect(counterModel('1ON1', true)).toEqual(false);
+    expect(counterModel(['1', '1'], true)).toEqual(false);
+    expect(counterModel(['2', ['1', '2']], true)).toEqual(false);
+    expect(counterModel([['1', '3'], ['1', '2']], true)).toEqual(false);
+    expect(counterModel([['1AN1'], []], true)).toEqual(false);
+    expect(counterModel(['1AN1', []], true)).toEqual(false);
+    expect(counterModel([[], ['1ON1']], true)).toEqual(false);
+    expect(counterModel([[], '1ON1'], true)).toEqual(false);
+    expect(counterModel([['1', '1T2'], '2'], true)).toEqual(false);
   });
 });
 
