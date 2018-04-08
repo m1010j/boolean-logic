@@ -47,7 +47,6 @@ Logic.prototype.supposeTrue = function() {
   }
 
   const wff = this;
-
   const length = wff.length();
   let model = {
     [wff.stringify()]: { truthValue: true },
@@ -295,7 +294,14 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.push([false, false]);
         model[nodeString].snapshot = merge({}, model);
         model[firstComponentString] = { truthValue: true };
-        model[secondComponentString] = { truthValue: false };
+        if (
+          model[secondComponentString] &&
+          model[secondComponentString].truthValue
+        ) {
+          handleInconsistency();
+        } else {
+          model[secondComponentString] = { truthValue: false };
+        }
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [false, true])
@@ -307,7 +313,14 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
         model[firstComponentString] = { truthValue: false };
-        model[secondComponentString] = { truthValue: true };
+        if (
+          model[secondComponentString] &&
+          !model[secondComponentString].truthValue
+        ) {
+          handleInconsistency();
+        } else {
+          model[secondComponentString] = { truthValue: true };
+        }
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [false, false])
@@ -475,7 +488,14 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
         model[firstComponentString] = { truthValue: true };
-        model[secondComponentString] = { truthValue: false };
+        if (
+          model[secondComponentString] &&
+          model[secondComponentString].truthValue
+        ) {
+          handleInconsistency();
+        } else {
+          model[secondComponentString] = { truthValue: false };
+        }
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [false, true])
@@ -487,7 +507,14 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
         model[firstComponentString] = { truthValue: false };
-        model[secondComponentString] = { truthValue: true };
+        if (
+          model[secondComponentString] &&
+          !model[secondComponentString].truthValue
+        ) {
+          handleInconsistency();
+        } else {
+          model[secondComponentString] = { truthValue: true };
+        }
       } else {
         handleInconsistency();
       }
@@ -645,7 +672,14 @@ Logic.prototype.supposeTrue = function() {
           nodeOpenPossibilities.push([false, true]);
           model[nodeString].snapshot = merge({}, model);
           model[firstComponentString] = { truthValue: true };
-          model[secondComponentString] = { truthValue: false };
+          if (
+            model[secondComponentString] &&
+            model[secondComponentString].truthValue
+          ) {
+            handleInconsistency();
+          } else {
+            model[secondComponentString] = { truthValue: false };
+          }
         } else if (
           nodeOpenPossibilities &&
           arrayIncludesArray(nodeOpenPossibilities, [false, true])
@@ -657,7 +691,14 @@ Logic.prototype.supposeTrue = function() {
           nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
           model[nodeString].snapshot = merge({}, model);
           model[firstComponentString] = { truthValue: false };
-          model[secondComponentString] = { truthValue: true };
+          if (
+            model[secondComponentString] &&
+            !model[secondComponentString].truthValue
+          ) {
+            handleInconsistency();
+          } else {
+            model[secondComponentString] = { truthValue: true };
+          }
         } else {
           handleInconsistency();
         }
@@ -740,7 +781,14 @@ Logic.prototype.supposeTrue = function() {
           nodeOpenPossibilities.push([false, true]);
           model[nodeString].snapshot = merge({}, model);
           model[firstComponentString] = { truthValue: true };
-          model[secondComponentString] = { truthValue: false };
+          if (
+            model[secondComponentString] &&
+            model[secondComponentString].truthValue
+          ) {
+            handleInconsistency();
+          } else {
+            model[secondComponentString] = { truthValue: false };
+          }
         } else if (
           nodeOpenPossibilities &&
           arrayIncludesArray(nodeOpenPossibilities, [false, true])
@@ -752,7 +800,14 @@ Logic.prototype.supposeTrue = function() {
           nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
           model[nodeString].snapshot = merge({}, model);
           model[firstComponentString] = { truthValue: false };
-          model[secondComponentString] = { truthValue: true };
+          if (
+            model[secondComponentString] &&
+            !model[secondComponentString].truthValue
+          ) {
+            handleInconsistency();
+          } else {
+            model[secondComponentString] = { truthValue: true };
+          }
         } else {
           handleInconsistency();
         }
@@ -853,7 +908,7 @@ Logic.prototype.supposeTrue = function() {
       handleNodeFalse();
     } else {
       if (
-        firstComponentValueInModel === false &&
+        firstComponentValueInModel === true &&
         secondComponentValueInModel === false
       ) {
         handleInconsistency();
@@ -872,7 +927,7 @@ Logic.prototype.supposeTrue = function() {
         firstComponentValueInModel === true &&
         secondComponentValueInModel === undefined
       ) {
-        model[firstComponentString] = { truthValue: true };
+        model[secondComponentString] = { truthValue: true };
       } else if (
         firstComponentValueInModel === undefined &&
         secondComponentValueInModel === true
@@ -896,7 +951,14 @@ Logic.prototype.supposeTrue = function() {
         handleInconsistency();
       } else {
         model[firstComponentString] = { truthValue: true };
-        model[secondComponentString] = { truthValue: false };
+        if (
+          model[secondComponentString] &&
+          model[secondComponentString].truthValue
+        ) {
+          handleInconsistency();
+        } else {
+          model[secondComponentString] = { truthValue: false };
+        }
       }
     }
 
@@ -984,7 +1046,14 @@ Logic.prototype.supposeTrue = function() {
         nodeOpenPossibilities.splice(currentPossibilityIdx, 1);
         model[nodeString].snapshot = merge({}, model);
         model[firstComponentString] = { truthValue: false };
-        model[secondComponentString] = { truthValue: true };
+        if (
+          model[secondComponentString] &&
+          !model[secondComponentString].truthValue
+        ) {
+          handleInconsistency();
+        } else {
+          model[secondComponentString] = { truthValue: true };
+        }
       } else if (
         nodeOpenPossibilities &&
         arrayIncludesArray(nodeOpenPossibilities, [false, false])
