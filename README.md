@@ -4,7 +4,7 @@
 
 ### Overview
 
-The `boolean-logic` package allows well-formed formulas, represented either as strings or as arrays of strings, to be evaluated for truth or falsity using the `isTrue` function, for satisfiability using the `isSat` function, for validity using the `isValid` function. The `counterModel` function finds counter-models for well-formed formulas that aren't valid. The `isSat`, `isValid`, and `counterModel` can also be used to evaluate premise-conclusion arguments. The default object exported by `boolean-logic` contains `isTrue`, `isSat`, `isValid`, and `counterModel` as properties.
+The `boolean-logic` package allows well-formed formulas, represented either as strings or as arrays of strings, to be evaluated for truth or falsity using the `isTrue` function, for satisfiability using the `isSat` function, for validity using the `isValid` function. The `counterModel` function finds counter-models for well-formed formulas that aren't valid. `isSat`, `isValid`, and `counterModel` can also be used to evaluate premise-conclusion arguments. The default object exported by `boolean-logic` contains `isTrue`, `isSat`, `isValid`, and `counterModel` as properties.
 
 ### Well-formed formulas
 
@@ -23,7 +23,7 @@ For `array` an array of strings, `array` is a wff if `array.join('')` is a wff.
 
 ### Premise-conclusion arguments
 
-For `p` and `q` string wffs and `arr1` and `arr2` (possibly empty) arrays of wffs, `[${p}, ${q}]`, `[${arr1}, ${q}]`, `[${p}, ${arr2}]`, `[${arr1}, ${arr2}]`. When `arr1` or `arr2` are empty, they are treated as equivalent to `t` when they act as premises (the first member of the argument) and as equivalent to `f` when they act as conclusions (the second member of the argument).
+For `p` and `q` string wffs and `arr1` and `arr2` (possibly empty) arrays of wffs, `[${p}, ${q}]`, `[${arr1}, ${q}]`, `[${p}, ${arr2}]`, `[${arr1}, ${arr2}]` are (premise-conclusion) arguments. When `arr1` or `arr2` are empty, they are treated as equivalent to `t` when they act as premises (the first member of the argument) and as equivalent to `f` when they act as conclusions (the second member of the argument).
 
 ### Installation
 
@@ -84,6 +84,8 @@ isValid(argument[, bruteForce]);
 ##### Return value
 
 `true`, `false`, or `undefined` (if `argument` isn't well-formed).
+
+#### `counterModel()`
 
 ```javascript
 counterModel(argument[, bruteForce]);
