@@ -1,6 +1,6 @@
 {
   "name": "boolean-logic",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description":
     "A lightweight package for evaluating formulas of Boolean logic",
   "main": "boolean-logic.js",
@@ -17,8 +17,7 @@
   },
   "scripts": {
     "test": "jest",
-    "start": "webpack --watch",
-    "postinstall": "webpack"
+    "start": "webpack --watch"
   },
   "jest": {
     "automock": true
