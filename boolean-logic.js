@@ -85,5 +85,3 @@ export const normalize = Logic.normalize.bind(Logic);
 export const reduce = Logic.reduce.bind(Logic);
 
 export default Logic;
-
-window.Logic = Logic;
