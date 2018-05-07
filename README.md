@@ -2,6 +2,10 @@
 
 ## A lightweight package for evaluating formulas of Boolean logic
 
+### Code status
+
+[ ![Codeship Status for m1010j/boolean-logic](https://app.codeship.com/projects/5a9e6f80-33db-0136-62d8-0e66b751bd02/status?branch=master)](https://app.codeship.com/projects/288987)
+
 ### Overview
 
 The `boolean-logic` package allows well-formed formulas, represented either as strings or as arrays of strings, to be evaluated for truth or falsity using the `isTrue` function, for satisfiability using the `isSat` function, for validity using the `isValid` function. The `counterModel` function finds counter-models for well-formed formulas that aren't valid. `isSat`, `isValid`, and `counterModel` can also be used to evaluate premise-conclusion arguments. The default object exported by `boolean-logic` contains `isTrue`, `isSat`, `isValid`, and `counterModel` as properties.
