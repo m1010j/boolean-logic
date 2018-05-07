@@ -4,6 +4,7 @@
   "description": "A lightweight package for evaluating formulas of Boolean logic",
   "main": "boolean-logic.js",
   "dependencies": {
+    "jest-css-modules": "^1.1.0",
     "lodash": "^4.17.10",
     "npm": "^6.0.0"
   },
@@ -20,7 +21,23 @@
     "start": "webpack --watch"
   },
   "jest": {
-    "automock": true
+    "verbose": true,
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.(css|scss|less)$": "jest-css-modules"
+    },
+    "globals": {
+      "NODE_ENV": "test"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "src/frontend",
+      "src/shared"
+    ]
   },
   "repository": "git+https://github.com/m1010j/boolean-logic.git",
   "keywords": [
