@@ -67,7 +67,7 @@ isSat(wffs[, returnModel, bruteForce]);
 
 `returnModel` (optional): A Boolean indicating whether function should return a model or `true` if `wff` is satisfiable. If this parameter isn't supplied, no model will be returned.
 
-`bruteForce` (optional): A Boolean indicating whether satisfiability should be determined by brute force by first generating all possible models. If this parameter isn't supplied, the short truth table algorithm will be used.
+`bruteForce` (optional): A Boolean indicating whether satisfiability should be determined by brute force by generating all possible models. Its default value is `true`. If this parameter set to `false`, the short truth table algorithm will be used.
 
 ##### Return value
 
@@ -83,7 +83,7 @@ isValid(argument[, bruteForce]);
 
 `argument`: A wff string or argument to be evaluated.
 
-`bruteForce` (optional): A Boolean indicating whether validity should be determined by brute force by first generating all possible models. If this parameter isn't supplied, the short truth table algorithm will be used.
+`bruteForce` (optional): A Boolean indicating whether validity should be determined by brute force by generating all possible models. Its default value is `true`. If this parameter set to `false`, the short truth table algorithm will be used.
 
 ##### Return value
 

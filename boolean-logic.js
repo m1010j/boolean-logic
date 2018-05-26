@@ -8,7 +8,7 @@ Logic.isTrue = function(wff, model) {
   return parsed.isTrue(model);
 };
 
-Logic.isSat = function(wffs, returnModel, bruteForce) {
+Logic.isSat = function(wffs, returnModel, bruteForce = true) {
   if (wffs instanceof Array) {
     wffs = wffs.join('A');
   }
@@ -34,7 +34,7 @@ Logic.isSat = function(wffs, returnModel, bruteForce) {
   }
 };
 
-Logic.isValid = function(argument, bruteForce) {
+Logic.isValid = function(argument, bruteForce = true) {
   argument = this._validateArgument(argument);
   if (!argument) return;
   return !this.isSat(`N${argument}`, false, bruteForce);
