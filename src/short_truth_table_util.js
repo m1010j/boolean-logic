@@ -129,7 +129,7 @@ Logic.prototype.supposeTrue = function() {
 
   function handleNot() {
     negatumValueInModel = undefined;
-    negatumString = node.children[0].stringify();
+    negatumString = node.left().stringify();
     if (model[negatumString] !== undefined) {
       negatumValueInModel = model[negatumString].truthValue;
     }
@@ -141,8 +141,8 @@ Logic.prototype.supposeTrue = function() {
   }
 
   function handleAnd() {
-    firstComponentString = node.children[0].stringify();
-    secondComponentString = node.children[1].stringify();
+    firstComponentString = node.left().stringify();
+    secondComponentString = node.right().stringify();
     firstComponentValueInModel = undefined;
     secondComponentValueInModel = undefined;
     if (model[firstComponentString] !== undefined) {
@@ -340,8 +340,8 @@ Logic.prototype.supposeTrue = function() {
   }
 
   function handleOr() {
-    firstComponentString = node.children[0].stringify();
-    secondComponentString = node.children[1].stringify();
+    firstComponentString = node.left().stringify();
+    secondComponentString = node.right().stringify();
     firstComponentValueInModel = undefined;
     secondComponentValueInModel = undefined;
     if (model[firstComponentString] !== undefined) {
@@ -522,8 +522,8 @@ Logic.prototype.supposeTrue = function() {
   }
 
   function handleXor() {
-    firstComponentString = node.children[0].stringify();
-    secondComponentString = node.children[1].stringify();
+    firstComponentString = node.left().stringify();
+    secondComponentString = node.right().stringify();
     firstComponentValueInModel = undefined;
     secondComponentValueInModel = undefined;
     if (model[firstComponentString] !== undefined) {
@@ -706,8 +706,8 @@ Logic.prototype.supposeTrue = function() {
     }
   }
   function handleIff() {
-    firstComponentString = node.children[0].stringify();
-    secondComponentString = node.children[1].stringify();
+    firstComponentString = node.left().stringify();
+    secondComponentString = node.right().stringify();
     firstComponentValueInModel = undefined;
     secondComponentValueInModel = undefined;
     if (model[firstComponentString] !== undefined) {
@@ -891,8 +891,8 @@ Logic.prototype.supposeTrue = function() {
   }
 
   function handleIf() {
-    firstComponentString = node.children[0].stringify();
-    secondComponentString = node.children[1].stringify();
+    firstComponentString = node.left().stringify();
+    secondComponentString = node.right().stringify();
     firstComponentValueInModel = undefined;
     secondComponentValueInModel = undefined;
     if (model[firstComponentString] !== undefined) {
