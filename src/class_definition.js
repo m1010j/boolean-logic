@@ -20,7 +20,7 @@ class Logic {
 
     if (this.parent) {
       if (this.parent.children.length > 2) {
-        throw new Error("WffTree can't have more than two children");
+        throw new Error("Can't have more than two children");
       }
       this.parent.children.push(this);
     }
